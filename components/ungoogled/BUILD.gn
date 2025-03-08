@@ -1,0 +1,25 @@
+component("ungoogled_core") {
+  sources = [
+    "core_automation/controller_manager.cc",
+    "core_automation/controller_manager.h",
+    "core_automation/fingerprint_orchestrator.cc",
+    "core_automation/fingerprint_orchestrator.h",
+    "core_automation/unified_protection.cc",
+    "core_automation/unified_protection.h",
+    "core_automation/v8_protection.cc",
+    "core_automation/v8_protection.h",
+    "hardware/hardware_api_protection.cc",
+    "hardware/hardware_api_protection.h",
+  ]
+
+  deps = [
+    "//base",
+    "//content/public/browser",
+    "//third_party/blink/public/common",
+    "//components/ungoogled:ungoogled_switches",
+    "//components/privacy_sandbox",
+    "//components/security_interstitials/core",
+  ]
+
+  defines = [ "IS_UNGOOGLED_IMPL" ]
+}

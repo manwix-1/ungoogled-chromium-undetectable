@@ -1,0 +1,35 @@
+--- a/storage/browser/quota/quota_manager.cc
++++ b/storage/browser/quota/quota_manager.cc
+@@ +150,6 +150,35 @@ void QuotaManager::GetUsageAndQuota() {
++  if (RuntimeEnabledFeatures::FingerprintingStorageProtection()) {
++    auto* protection_manager = ungoogled::FingerprintingProtectionManager::GetInstance();
++    auto config = protection_manager->GetEffectiveConfig(origin.GetURL().host());
++    
++    if (config.storage.normalize_quota) {
++      int64_t standard_quota = config.storage.standard_quota_size;
++      
++      if (config.storage.randomize_storage_quotas) {
++        // Add small random variation to prevent exact matching
++        double variation = 0.1;  // 10% variation
++        standard_quota += static_cast<int64_t>(
++            standard_quota * (GenerateNoise(variation)));
++      }
++      
++      callback.Run(blink::mojom::QuotaStatusCode::kOk,
++                  0,  // Current usage
++                  standard_quota);
++      return;
++    }
++  }
+
+--- a/third_party/blink/renderer/modules/storage/storage_controller.cc
++++ b/third_party/blink/renderer/modules/storage/storage_controller.cc
+@@ +200,6 +200,25 @@ void StorageController::EstimateStorage() {
++  if (RuntimeEnabledFeatures::FingerprintingStorageProtection()) {
++    // Return standardized storage estimates
++    StorageEstimate estimate;
++    estimate.usage = 0;
++    estimate.quota = 10737418240;  // 10GB
++    estimate.usageDetails.clear();
++    return estimate;
++  }

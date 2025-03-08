@@ -1,0 +1,28 @@
+--- a/third_party/blink/renderer/modules/battery/battery_manager.cc
++++ b/third_party/blink/renderer/modules/battery/battery_manager.cc
+@@ +180,6 +180,19 @@ void BatteryManager::UpdateBatteryStatus() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized battery status
++    battery_status_.charging = true;
++    battery_status_.charging_time = std::numeric_limits<double>::infinity();
++    battery_status_.discharging_time = std::numeric_limits<double>::infinity();
++    battery_status_.level = 1.0;  // Always show as fully charged
++    
++    NotifyBatteryStatusChanged();
++    return;
++  }
+
+--- a/third_party/blink/renderer/modules/network_info/network_info.cc
++++ b/third_party/blink/renderer/modules/network_info/network_info.cc
+@@ +150,6 +150,18 @@ void NetworkInfo::UpdateNetworkInformation() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized network information
++    connection_type_ = kConnectionTypeWifi;
++    effective_type_ = WebEffectiveConnectionType::kType4G;
++    downlink_max_ = 10.0;  // 10 Mbps
++    downlink_ = 5.0;       // 5 Mbps
++    rtt_ = 50;            // 50ms RTT
++    
++    NotifyNetworkChanged();
++    return;
++  }

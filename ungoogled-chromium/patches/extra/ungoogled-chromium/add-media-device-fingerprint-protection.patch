@@ -1,0 +1,65 @@
+--- a/third_party/blink/renderer/modules/mediastream/media_devices.cc
++++ b/third_party/blink/renderer/modules/mediastream/media_devices.cc
+@@ +280,6 +280,35 @@ void MediaDevices::EnumerateDevices(ScriptPromiseResolver* resolver) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized device list to prevent fingerprinting
++    HeapVector<Member<MediaDeviceInfo>> device_info;
++    
++    // Add standard video device
++    device_info.push_back(MakeGarbageCollected<MediaDeviceInfo>(
++        "default-video-device-id",
++        "videoinput",
++        "Standard Webcam",
++        ""));
++        
++    // Add standard audio input
++    device_info.push_back(MakeGarbageCollected<MediaDeviceInfo>(
++        "default-audio-input-id",
++        "audioinput",
++        "Standard Microphone",
++        ""));
++        
++    // Add standard audio output
++    device_info.push_back(MakeGarbageCollected<MediaDeviceInfo>(
++        "default-audio-output-id",
++        "audiooutput",
++        "Standard Speakers",
++        ""));
++    
++    resolver->Resolve(device_info);
++    return;
++  }
+
+--- a/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_video.cc
++++ b/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_video.cc
+@@ +180,6 +180,20 @@ MediaTrackConstraints MediaStreamConstraintsUtilVideo::GetDefaultConstraints() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized video constraints
++    MediaTrackConstraints constraints;
++    constraints.setWidth(1280);  // Standard HD width
++    constraints.setHeight(720);  // Standard HD height
++    constraints.setAspectRatio(1.7778);  // 16:9
++    constraints.setFrameRate(30.0);
++    constraints.setFacingMode("user");
++    
++    // Disable advanced capabilities that could be used for fingerprinting
++    constraints.setDeviceId("");
++    constraints.setGroupId("");
++    return constraints;
++  }
+
+--- a/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc
++++ b/third_party/blink/renderer/modules/mediastream/media_stream_constraints_util_audio.cc
+@@ +150,6 +150,18 @@ MediaTrackConstraints MediaStreamConstraintsUtilAudio::GetDefaultConstraints() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized audio constraints
++    MediaTrackConstraints constraints;
++    constraints.setSampleRate(44100);  // CD quality
++    constraints.setSampleSize(16);     // 16-bit
++    constraints.setChannelCount(2);    // Stereo
++    
++    // Disable device-specific identifiers
++    constraints.setDeviceId("");
++    constraints.setGroupId("");
++    return constraints;
++  }

@@ -1,0 +1,41 @@
+import("//build/config/chromeos/rules.gni")
+import("//components/ungoogled/buildflags/buildflags.gni")
+import("//testing/test.gni")
+
+component("ungoogled") {
+  sources = [
+    "core_automation/controller_manager.cc",
+    "core_automation/controller_manager.h",
+    "core_automation/fingerprint_orchestrator.cc",
+    "core_automation/fingerprint_orchestrator.h",
+    "core_automation/unified_protection.cc",
+    "core_automation/unified_protection.h",
+    "core_automation/network_privacy_manager.cc",
+    "core_automation/network_privacy_manager.h",
+  ]
+
+  deps = [
+    "//base",
+    "//content/public/browser",
+    "//components/privacy_sandbox",
+    "//components/security_interstitials/core",
+    "//third_party/blink/public/common",
+  ]
+
+  defines = [ "IS_UNGOOGLED_IMPL" ]
+}
+
+test("ungoogled_unittests") {
+  sources = [
+    "core_automation/noise_generator_unittest.cc",
+    # Add other test files here
+  ]
+
+  deps = [
+    ":core_automation",
+    "//base",
+    "//base/test:test_support",
+    "//testing/gtest",
+    "//testing/gmock",
+  ]
+}

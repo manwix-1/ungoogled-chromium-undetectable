@@ -1,0 +1,45 @@
+--- a/net/base/network_interfaces.cc
++++ b/net/base/network_interfaces.cc
+@@ +150,6 +150,20 @@ bool GetNetworkList(NetworkInterfaceList* networks,
+                     int policy) {
++  if (base::FeatureList::IsEnabled(features::kNetworkFingerprintingProtection)) {
++    // Return standardized network interface
++    networks->clear();
++    NetworkInterface interface;
++    interface.name = "eth0";
++    interface.friendly_name = "Ethernet";
++    // Use consistent MAC address
++    static const uint8_t kStandardMac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
++    interface.mac_address.assign(kStandardMac, kStandardMac + 6);
++    // Use standard IPv4 address
++    interface.address = IPAddress(192, 168, 1, 2);
++    interface.prefix_length = 24;
++    interface.type = NetworkChangeNotifier::CONNECTION_ETHERNET;
++    networks->push_back(interface);
++    return true;
++  }
+
+--- a/net/http/http_request_headers.cc
++++ b/net/http/http_request_headers.cc
+@@ +180,6 +180,25 @@ void HttpRequestHeaders::SetHeader(
+     const std::string& value) {
++  if (base::FeatureList::IsEnabled(features::kNetworkFingerprintingProtection)) {
++    // Normalize headers that could be used for fingerprinting
++    if (key == "Accept-Language") {
++      SetHeaderWithoutUpdate("Accept-Language", "en-US,en;q=0.9");
++      return;
++    }
++    if (key == "Accept") {
++      SetHeaderWithoutUpdate("Accept", 
++          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
++      return;
++    }
++    if (key == "User-Agent") {
++      // Already handled in Navigator::userAgent()
++      return;
++    }
++    if (key == "Accept-Encoding") {
++      SetHeaderWithoutUpdate("Accept-Encoding", "gzip, deflate, br");
++      return;
++    }
++  }

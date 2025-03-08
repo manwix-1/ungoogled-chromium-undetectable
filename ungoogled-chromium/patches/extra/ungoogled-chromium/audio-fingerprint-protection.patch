@@ -1,0 +1,43 @@
+--- a/third_party/blink/renderer/modules/webaudio/audio_buffer.cc
++++ b/third_party/blink/renderer/modules/webaudio/audio_buffer.cc
+@@ +150,6 +150,35 @@ void AudioBuffer::getChannelData(unsigned channel, Float32Array* destination) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Add subtle noise to audio data
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    static thread_local std::uniform_real_distribution<float> noise(-0.000001f, 0.000001f);
++    
++    float* data = destination->Data();
++    size_t length = destination->length();
++    
++    for (size_t i = 0; i < length; ++i) {
++      data[i] += noise(gen);
++    }
++  }
+
+--- a/third_party/blink/renderer/modules/webaudio/analyser_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/analyser_node.cc
+@@ +200,6 +200,25 @@ void AnalyserNode::getFloatFrequencyData(Float32Array* array) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize frequency data
++    float* data = array->Data();
++    size_t length = array->length();
++    
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    static thread_local std::uniform_real_distribution<float> noise(-0.1f, 0.1f);
++    
++    for (size_t i = 0; i < length; ++i) {
++      data[i] = -50.0f + noise(gen);  // Standard frequency response
++    }
++  }
+
+--- a/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
+@@ +150,6 +150,20 @@ void OscillatorNode::setPeriodicWave(PeriodicWave* wave) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize oscillator characteristics
++    setFrequency(440.0);  // Standard A4 note
++    setDetune(0.0);
++    setType("sine");
++  }

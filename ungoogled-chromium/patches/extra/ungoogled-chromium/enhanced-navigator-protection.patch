@@ -1,0 +1,39 @@
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ +150,6 +150,45 @@ String Navigator::userAgent() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standardized UA string
++    return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
++           "AppleWebKit/537.36 (KHTML, like Gecko) "
++           "Chrome/120.0.0.0 Safari/537.36";
++  }
+
+@@ +200,6 +200,30 @@ unsigned Navigator::hardwareConcurrency() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standard value for CPU cores
++    return 4;
++  }
+
+@@ +250,6 +250,25 @@ String Navigator::platform() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standard platform
++    return "Win32";
++  }
+
+@@ +300,6 +300,25 @@ float Navigator::deviceMemory() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standard memory amount
++    return 8.0;
++  }
+
+@@ +350,6 +350,30 @@ String Navigator::language() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standard language
++    return "en-US";
++  }
+
+@@ +400,6 +400,35 @@ DOMPluginArray* Navigator::plugins() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return empty plugin array
++    return MakeGarbageCollected<DOMPluginArray>();
++  }

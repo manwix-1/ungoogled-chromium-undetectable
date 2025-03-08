@@ -1,0 +1,23 @@
+// Standardize system information
+void Navigator::NormalizeSystemInfo() {
+  // Consistent core count
+  hardwareConcurrency_ = 4;
+  
+  // Standard memory size
+  deviceMemory_ = 8;
+  
+  // Normalize platform
+  platform_ = "Win32";
+  
+  // Standard screen metrics
+  screen_->width_ = 1920;
+  screen_->height_ = 1080;
+  screen_->colorDepth_ = 24;
+  
+  // Consistent performance characteristics
+  performance_->memory_->jsHeapSizeLimit = 2147483648;  // 2GB
+  performance_->memory_->totalJSHeapSize = 1073741824;  // 1GB
+  
+  // Normalize timing precision
+  performance_->timeOrigin_ = RoundToNearestSecond(performance_->timeOrigin_);
+}

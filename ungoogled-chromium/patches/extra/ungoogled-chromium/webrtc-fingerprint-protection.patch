@@ -1,0 +1,29 @@
+--- a/third_party/webrtc/modules/desktop_capture/desktop_capturer.cc
++++ b/third_party/webrtc/modules/desktop_capture/desktop_capturer.cc
+@@ +150,6 +150,18 @@ void DesktopCapturer::GetScreenList(ScreenList* screens) {
++  if (RuntimeEnabledFeatures::FingerprintingWebRTCProtection()) {
++    // Normalize screen information
++    screens->clear();
++    Screen screen;
++    screen.id = 1;
++    screen.title = "Display 1";
++    // Standard resolution
++    screen.resolution = DesktopSize(1920, 1080);
++    screens->push_back(screen);
++    return;
++  }
+
+--- a/third_party/webrtc/modules/audio_device/audio_device_impl.cc
++++ b/third_party/webrtc/modules/audio_device/audio_device_impl.cc
+@@ +180,6 +180,15 @@ int32_t AudioDeviceImpl::GetDeviceName(
+     char* deviceName,
+     char* deviceUniqueId) {
++  if (RuntimeEnabledFeatures::FingerprintingWebRTCProtection()) {
++    // Return standard audio device info
++    static const char* kStandardAudioDevice = "Standard Audio Device";
++    static const char* kStandardAudioID = "STDAUD001";
++    
++    strncpy(deviceName, kStandardAudioDevice, kAdmMaxDeviceNameSize);
++    strncpy(deviceUniqueId, kStandardAudioID, kAdmMaxGuidSize);
++    return 0;
++  }

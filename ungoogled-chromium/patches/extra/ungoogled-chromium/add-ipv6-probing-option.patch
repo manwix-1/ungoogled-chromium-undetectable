@@ -1,0 +1,36 @@
+# Disables IPv6 probing and adds an option to change the IPv6 probing result
+
+--- a/chrome/browser/ungoogled_flag_entries.h
++++ b/chrome/browser/ungoogled_flag_entries.h
+@@ -4,4 +4,8 @@
+ 
+ #ifndef CHROME_BROWSER_UNGOOGLED_FLAG_ENTRIES_H_
+ #define CHROME_BROWSER_UNGOOGLED_FLAG_ENTRIES_H_
++    {"set-ipv6-probe-false",
++     "SetIpv6ProbeFalse",
++     "Forces the result of the browser's IPv6 probing (i.e. IPv6 connectivity test) to be unsuccessful. This causes IPv4 addresses to be prioritized over IPv6 addresses. Without this flag, the probing result is set to be successful, which causes IPv6 to be used over IPv4 when possible. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(net::features::kSetIpv6ProbeFalse)},
+ #endif  // CHROME_BROWSER_UNGOOGLED_FLAG_ENTRIES_H_
+--- a/net/base/features.cc
++++ b/net/base/features.cc
+@@ -13,8 +13,20 @@
+ namespace net::features {
+ 
+-BASE_FEATURE(kSetIpv6ProbeFalse, "SetIpv6ProbeFalse", base::FEATURE_DISABLED_BY_DEFAULT);
++// Enhanced network stack configuration
++BASE_FEATURE(kNetworkStackConfig, "NetworkStackConfig", base::FEATURE_ENABLED_BY_DEFAULT);
+ 
++const base::FeatureParam<bool> kEnableIPv6 {
++  &kNetworkStackConfig, "enable_ipv6", true
++};
++
++const base::FeatureParam<NetworkPriority> kAddressFamily {
++  &kNetworkStackConfig,
++  "address_family",
++  NetworkPriority::AUTO,
++  {{
++    {"auto", NetworkPriority::AUTO},
++    {"ipv4", NetworkPriority::IPV4_PREFERRED},
++    {"ipv6", NetworkPriority::IPV6_PREFERRED}
++  }}
++};

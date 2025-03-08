@@ -1,0 +1,55 @@
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ +150,6 +150,35 @@ void BaseRenderingContext2D::fillRect(double x, double y, double w, double h) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Add subtle noise to canvas operations
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    static thread_local std::uniform_real_distribution<> noise(-0.01, 0.01);
++    
++    x += noise(gen);
++    y += noise(gen);
++    w += noise(gen);
++    h += noise(gen);
++  }
++
+@@ +200,6 +200,25 @@ String BaseRenderingContext2D::textAlign() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize text rendering
++    return "center";
++  }
+
+@@ +250,6 +250,30 @@ TextMetrics* BaseRenderingContext2D::measureText(const String& text) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize text metrics
++    auto* metrics = MakeGarbageCollected<TextMetrics>();
++    metrics->setWidth(text.length() * 10.0);  // Fixed width per character
++    metrics->setActualBoundingBoxAscent(15.0);
++    metrics->setActualBoundingBoxDescent(5.0);
++    metrics->setFontBoundingBoxAscent(18.0);
++    metrics->setFontBoundingBoxDescent(6.0);
++    return metrics;
++  }
+
+@@ +300,6 +300,35 @@ ImageData* BaseRenderingContext2D::getImageData(int sx, int sy, int sw, int sh) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    ImageData* data = original_getImageData(sx, sy, sw, sh);
++    if (!data) return nullptr;
++    
++    // Add noise to pixel data
++    unsigned char* pixels = data->data()->Data();
++    size_t length = data->data()->length();
++    
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    static thread_local std::uniform_int_distribution<> noise(-1, 1);
++    
++    for (size_t i = 0; i < length; i += 4) {
++      // Modify RGB values slightly, preserve alpha
++      pixels[i] = std::clamp(pixels[i] + noise(gen), 0, 255);
++      pixels[i+1] = std::clamp(pixels[i+1] + noise(gen), 0, 255);
++      pixels[i+2] = std::clamp(pixels[i+2] + noise(gen), 0, 255);
++    }
++    
++    return data;
++  }

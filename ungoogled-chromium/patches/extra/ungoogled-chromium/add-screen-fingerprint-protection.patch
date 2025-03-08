@@ -1,0 +1,35 @@
+--- a/third_party/blink/renderer/core/frame/screen.cc
++++ b/third_party/blink/renderer/core/frame/screen.cc
+@@ +180,6 +180,20 @@ unsigned Screen::height() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standard 1920x1080 resolution
++    return 1080;
++  }
+
+@@ +200,6 +200,14 @@ unsigned Screen::width() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 1920;
++  }
+
+@@ +220,6 +220,14 @@ unsigned Screen::colorDepth() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 24;  // Standard 24-bit color depth
++  }
+
+@@ +240,6 +240,14 @@ float Screen::devicePixelRatio() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 1.0;  // Standard pixel ratio
++  }
+
+--- a/third_party/blink/renderer/core/css/media_values.cc
++++ b/third_party/blink/renderer/core/css/media_values.cc
+@@ +180,6 +180,15 @@ bool MediaValues::ComputeOrientation() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Always return landscape orientation
++    return true;
++  }
+
+@@ +220,6 +220,14 @@ int MediaValues::ComputeDevicePixelRatio() {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 1;  // Standard pixel ratio for media queries
++  }

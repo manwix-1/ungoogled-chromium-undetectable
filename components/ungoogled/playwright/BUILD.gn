@@ -1,0 +1,20 @@
+component("playwright_integration") {
+  sources = [
+    "playwright_controller.cc",
+    "playwright_controller.h",
+    "virtual_display.cc", 
+    "virtual_display.h",
+    "automation_bridge.cc",
+    "automation_bridge.h"
+  ]
+
+  deps = [
+    "//base",
+    "//content/public/browser",
+    "//third_party/blink/public/common",
+    "//ui/gfx",
+    "//components/ungoogled:ungoogled_switches"
+  ]
+
+  defines = [ "IS_PLAYWRIGHT_IMPL" ]
+}

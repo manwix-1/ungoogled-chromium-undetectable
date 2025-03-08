@@ -1,0 +1,31 @@
+--- a/third_party/blink/renderer/modules/webaudio/audio_context.cc
++++ b/third_party/blink/renderer/modules/webaudio/audio_context.cc
+@@ +150,6 +150,45 @@ AudioBuffer* AudioContext::createBuffer() {
++  if (RuntimeEnabledFeatures::FingerprintingAudioProtection()) {
++    // Add subtle noise to audio operations
++    const float kNoiseLevel = 0.0001f;
++    for (unsigned i = 0; i < buffer->length(); ++i) {
++      float noise = (rand() / static_cast<float>(RAND_MAX) - 0.5f) * kNoiseLevel;
++      buffer->getChannelData(0)[i] += noise;
++    }
++    
++    // Normalize audio context properties
++    setSampleRate(44100);
++    setChannelCount(2);
++    setChannelCountMode(kExplicit);
++    setChannelInterpretation(kSpeakers);
++  }
+
+--- a/third_party/blink/renderer/modules/webaudio/analyser_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/analyser_node.cc
+@@ +200,6 +200,30 @@ void AnalyserNode::getFloatFrequencyData() {
++  if (RuntimeEnabledFeatures::FingerprintingAudioProtection()) {
++    // Normalize frequency data
++    const float kMinDecibels = -100;
++    const float kMaxDecibels = -30;
++    for (unsigned i = 0; i < array->length(); ++i) {
++      array->data()[i] = kMinDecibels + 
++          (rand() / static_cast<float>(RAND_MAX)) * (kMaxDecibels - kMinDecibels);
++    }
++    return;
++  }

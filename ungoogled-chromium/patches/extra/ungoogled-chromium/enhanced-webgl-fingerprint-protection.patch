@@ -1,0 +1,58 @@
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ +150,6 +150,40 @@ String WebGLRenderingContextBase::getParameter(GLenum pname) {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize WebGL parameters
++    switch (pname) {
++      case GL_VENDOR:
++        return "WebKit";
++      case GL_RENDERER:
++        return "WebKit WebGL";
++      case GL_VERSION:
++        return "WebGL 1.0";
++      case GL_SHADING_LANGUAGE_VERSION:
++        return "WebGL GLSL ES 1.0";
++      case GL_MAX_TEXTURE_SIZE:
++        return "8192";
++      case GL_MAX_VIEWPORT_DIMS:
++        return "8192,8192";
++      case UNMASKED_VENDOR_WEBGL:
++        return "Standard Vendor";
++      case UNMASKED_RENDERER_WEBGL:
++        return "Standard Renderer";
++    }
++  }
+
+@@ +200,6 +200,25 @@ ScriptValue WebGLRenderingContextBase::getSupportedExtensions() {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standardized extension list
++    return ScriptValue::From(script_state,
++      "ANGLE_instanced_arrays "
++      "EXT_blend_minmax "
++      "EXT_texture_filter_anisotropic "
++      "OES_element_index_uint "
++      "OES_standard_derivatives "
++      "OES_texture_float "
++      "OES_texture_float_linear "
++      "OES_vertex_array_object "
++      "WEBGL_compressed_texture_s3tc "
++      "WEBGL_depth_texture "
++      "WEBGL_draw_buffers");
++  }
+
+@@ +250,6 +250,30 @@ void WebGLRenderingContextBase::readPixels(GLint x, GLint y, GLsizei width,
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Add noise to WebGL readPixels output
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    static thread_local std::uniform_int_distribution<> noise(-1, 1);
++    
++    uint8_t* pixels = static_cast<uint8_t*>(pixels_array->BaseAddress());
++    size_t length = pixels_array->ByteLength();
++    
++    for (size_t i = 0; i < length; i += 4) {
++      pixels[i] = std::clamp(pixels[i] + noise(gen), 0, 255);
++      pixels[i+1] = std::clamp(pixels[i+1] + noise(gen), 0, 255);
++      pixels[i+2] = std::clamp(pixels[i+2] + noise(gen), 0, 255);
++    }
++  }

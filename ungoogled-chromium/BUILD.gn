@@ -1,0 +1,22 @@
+# Enhanced build configuration
+config("browser_config") {
+  defines = [
+    "ENABLE_UNIFIED_FINGERPRINTING",
+    "ENABLE_ADVANCED_NETWORKING",
+  ]
+}
+
+component("browser_core") {
+  sources = [
+    "browser/fingerprinting/unified_protection.cc",
+    "browser/fingerprinting/unified_protection.h",
+    "browser/network/stack_config.cc",
+    "browser/network/stack_config.h",
+  ]
+
+  deps = [
+    ":browser_config",
+    "//base",
+    "//net",
+  ]
+}

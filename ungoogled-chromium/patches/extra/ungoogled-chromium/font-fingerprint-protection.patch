@@ -1,0 +1,30 @@
+--- a/third_party/blink/renderer/core/css/font_face_set.cc
++++ b/third_party/blink/renderer/core/css/font_face_set.cc
+@@ +180,6 +180,15 @@ bool FontFaceSet::check(const String& font_string,
+                         const String& text,
+                        ExceptionState& exception_state) {
++  if (RuntimeEnabledFeatures::FingerprintingFontProtection()) {
++    // Return standard set of fonts only
++    static const char* standard_fonts[] = {
++      "Arial", "Times New Roman", "Courier New", 
++      "Georgia", "Verdana", "Helvetica"
++    };
++    for (const auto& font : standard_fonts) {
++      if (font_string.Contains(font)) return true;
++    }
++    return false;
++  }
+   
+--- a/third_party/blink/renderer/core/css/font_face_cache.cc
++++ b/third_party/blink/renderer/core/css/font_face_cache.cc
+@@ +220,6 +220,14 @@ void FontFaceCache::LoadFontAsync(const String& family_name) {
++  if (RuntimeEnabledFeatures::FingerprintingFontProtection()) {
++    // Normalize font loading timing
++    base::ThreadTaskRunnerHandle::Get()->PostDelayedTask(
++      FROM_HERE,
++      base::BindOnce(&FontFaceCache::CompleteFontLoad,
++                     weak_ptr_factory_.GetWeakPtr(),
++                     family_name),
++      base::Milliseconds(20));
++    return;
++  }

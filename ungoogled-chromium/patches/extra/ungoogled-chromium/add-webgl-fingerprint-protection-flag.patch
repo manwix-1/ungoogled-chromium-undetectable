@@ -1,0 +1,26 @@
+--- a/chrome/browser/ungoogled_flag_entries.h
++++ b/chrome/browser/ungoogled_flag_entries.h
+@@ +180,6 +180,10 @@
+     {"disable-qr-generator",
+     "Disable QR Generator",
+     "Disables the QR generator for sharing page links. ungoogled-chromium flag",
+     kOsDesktop, FEATURE_VALUE_TYPE(kDisableQRGenerator)},
++    {"enable-webgl-fingerprint-protection",
++     "WebGL Fingerprint Protection",
++     "Enables protection against WebGL and Canvas fingerprinting by normalizing parameters and adding subtle noise to canvas data. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingWebGLProtection)},
+ #endif  // CHROME_BROWSER_UNGOOGLED_FLAG_ENTRIES_H_
+
+--- a/third_party/blink/common/features.cc
++++ b/third_party/blink/common/features.cc
+@@ +20,6 +20,8 @@ namespace blink::features {
++BASE_FEATURE(kFingerprintingWebGLProtection,
++             "FingerprintingWebGLProtection",
++             base::FEATURE_DISABLED_BY_DEFAULT);
++
+--- a/third_party/blink/public/common/features.h
++++ b/third_party/blink/public/common/features.h
+@@ +50,6 +50,8 @@ namespace blink::features {
++// Enables WebGL fingerprinting protection
++BASE_DECLARE_FEATURE(kFingerprintingWebGLProtection);
++

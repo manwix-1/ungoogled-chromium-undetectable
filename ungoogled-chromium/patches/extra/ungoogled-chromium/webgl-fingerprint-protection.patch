@@ -1,0 +1,91 @@
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ +350,6 +350,35 @@ String WebGLRenderingContextBase::GetParameter(GLenum pname) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Normalize WebGL parameters to prevent fingerprinting
++    switch (pname) {
++      case GL_VENDOR:
++        return "WebKit";
++      case GL_RENDERER:
++        return "WebKit WebGL";
++      case GL_VERSION:
++        return "WebGL 1.0";
++      case GL_SHADING_LANGUAGE_VERSION:
++        return "WebGL GLSL ES 1.0";
++      case GL_EXTENSIONS:
++        // Return minimal set of extensions
++        return "ANGLE_instanced_arrays "
++               "EXT_blend_minmax "
++               "EXT_texture_filter_anisotropic "
++               "WEBKIT_EXT_texture_filter_anisotropic "
++               "OES_standard_derivatives "
++               "OES_texture_float "
++               "OES_texture_float_linear "
++               "OES_vertex_array_object "
++               "WEBGL_compressed_texture_s3tc "
++               "WEBGL_debug_renderer_info "
++               "WEBGL_depth_texture "
++               "WEBGL_draw_buffers";
++    }
++  }
+
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ +420,6 +420,25 @@ ImageData* BaseRenderingContext2D::getImageData(
+     int sy, int sw, int sh, ExceptionState& exception_state) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Add subtle noise to prevent canvas fingerprinting
++    ImageData* data = BaseGetImageData(sx, sy, sw, sh, exception_state);
++    if (!data)
++      return nullptr;
++      
++    unsigned char* pixels = data->data()->Data();
++    size_t length = data->data()->length();
++    
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    std::uniform_int_distribution<> noise(-1, 1);
++    
++    // Add minor noise to RGB values
++    for (size_t i = 0; i < length; i += 4) {
++      pixels[i] = std::clamp(pixels[i] + noise(gen), 0, 255);     // R
++      pixels[i+1] = std::clamp(pixels[i+1] + noise(gen), 0, 255); // G 
++      pixels[i+2] = std::clamp(pixels[i+2] + noise(gen), 0, 255); // B
++    }
++    return data;
++  }
+
+--- a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
+@@ +280,6 +280,20 @@ String WebGL2RenderingContextBase::GetParameter(GLenum pname) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Normalize WebGL2 specific parameters
++    switch (pname) {
++      case GL_VERSION:
++        return "WebGL 2.0";
++      case GL_SHADING_LANGUAGE_VERSION:
++        return "WebGL GLSL ES 3.00";
++      case GL_MAX_TEXTURE_SIZE:
++        return "8192";  // Standard max texture size
++      case GL_MAX_VIEWPORT_DIMS:
++        return "8192 8192";  // Standard viewport dimensions
++      case GL_MAX_RENDERBUFFER_SIZE:
++        return "8192";  // Standard renderbuffer size
++    }
++  }
+
+--- a/third_party/blink/renderer/modules/webgl/webgl_debug_renderer_info.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_debug_renderer_info.cc
+@@ +50,6 +50,15 @@ unsigned long WebGLDebugRendererInfo::unmaskedRendererWebgl() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 0x1F00;  // Return standard renderer ID
++  }
+   return GL_RENDERER;
+ }
+
+ unsigned long WebGLDebugRendererInfo::unmaskedVendorWebgl() const {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    return 0x1F01;  // Return standard vendor ID
++  }
+   return GL_VENDOR;
+ }

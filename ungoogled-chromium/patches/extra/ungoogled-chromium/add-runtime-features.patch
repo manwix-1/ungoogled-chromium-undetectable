@@ -1,0 +1,21 @@
+--- a/third_party/blink/renderer/platform/runtime_enabled_features.json5
++++ b/third_party/blink/renderer/platform/runtime_enabled_features.json5
+@@ -2028,6 +2028,18 @@
+     {
+       name: "FingerprintingCanvasImageDataNoise",
+     },
++    {
++      name: "FingerprintingTimingNoise",
++      status: "experimental",
++    },
++    {
++      name: "FingerprintingWebGLNoise",
++      status: "experimental",
++    },
++    {
++      name: "FingerprintingNavigatorNormalization",
++      status: "experimental",
++    },
+     {
+       name: "Fledge",
+       status: "stable",

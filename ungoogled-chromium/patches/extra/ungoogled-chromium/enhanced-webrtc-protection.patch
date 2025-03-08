@@ -1,0 +1,53 @@
+--- a/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection.cc
++++ b/third_party/blink/renderer/modules/peerconnection/rtc_peer_connection.cc
+@@ +150,6 +150,40 @@ void RTCPeerConnection::getConfiguration() {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Force privacy-preserving ICE settings
++    RTCConfiguration config;
++    config.ice_transport_policy = "relay";  // Force TURN usage
++    config.bundle_policy = "max-bundle";
++    config.rtcp_mux_policy = "require";
++    config.ice_candidate_pool_size = 0;
++    
++    // Disable MDNS
++    config.enable_mdns = false;
++    
++    // Force secure STUN/TURN servers
++    config.ice_servers.clear();
++    config.ice_servers.push_back(
++        ParseIceServer("stun:stun.l.google.com:19302"));
++    
++    setConfiguration(config);
++  }
+
+@@ +200,6 +200,35 @@ void RTCPeerConnection::createOffer() {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    RTCOfferOptions options;
++    // Disable features that could leak info
++    options.offer_to_receive_audio = 1;
++    options.offer_to_receive_video = 1;
++    options.voice_activity_detection = false;
++    options.ice_restart = false;
++    
++    createOffer(options);
++    return;
++  }
+
+--- a/content/browser/webrtc/webrtc_internals.cc
++++ b/content/browser/webrtc/webrtc_internals.cc
+@@ +150,6 +150,30 @@ void WebRTCInternals::OnGetStats() {
++  if (base::FeatureList::IsEnabled(features::kFingerprintingProtection)) {
++    // Return standardized stats
++    blink::WebRTCStats stats;
++    stats.timestamp = base::Time::Now();
++    stats.type = "standardized";
++    stats.id = "protected";
++    
++    // Hide real device info
++    stats.audio_level = 0.0;
++    stats.echo_return_loss = -100.0;
++    stats.packets_lost = 0;
++    stats.jitter = 0.0;
++    
++    return stats;
++  }

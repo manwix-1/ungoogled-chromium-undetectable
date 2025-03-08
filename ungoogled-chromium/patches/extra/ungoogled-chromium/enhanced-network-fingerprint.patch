@@ -1,0 +1,38 @@
+# Enhanced network stack fingerprint randomization
+
+--- a/net/socket/tcp_socket.cc
++++ b/net/socket/tcp_socket.cc
+@@ -156,6 +156,45 @@ int TCPSocket::Connect(const IPEndPoint& address,
+                       CompletionOnceCallback callback,
+                       const NetLogWithSource& net_log) {
++  if (base::FeatureList::IsEnabled(features::kEnhancedPrivacy)) {
++    RandomizeNetworkFingerprint();
++  }
+   return DoConnect(address, callback, net_log);
+ }
++
++void TCPSocket::RandomizeNetworkFingerprint() {
++  // Randomize TCP window size
++  uint32_t random_window = base::RandInt(16384, 65535);
++  SetWindowSize(random_window);
++
++  // Randomize TCP options
++  std::vector<TCPOption> options = GetDefaultOptions();
++  ShuffleTCPOptions(&options);
++  SetTCPOptions(options);
++
++  // Modify TCP/IP stack behavior
++  ModifyTCPIPBehavior();
++}
++
++void TCPSocket::ModifyTCPIPBehavior() {
++  // Randomize initial TTL
++  uint8_t ttl = base::RandInt(54, 64);
++  SetTTL(ttl);
++
++  // Randomize TCP timestamps
++  EnableRandomizedTimestamps();
++
++  // Modify MSS values
++  SetRandomizedMSS();
++}

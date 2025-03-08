@@ -1,0 +1,93 @@
+name: Build Protected Chromium
+
+on:
+  workflow_dispatch:  # For manual trigger
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly builds
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup ccache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Cache Chromium source
+        uses: actions/cache@v3
+        with:
+          path: build/src
+          key: ${{ runner.os }}-chromium-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-chromium-
+
+      - name: Setup build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3.9 python3-pip ninja-build ccache
+          python3 -m pip install -r .cirrus_requirements.txt
+
+      - name: Build ungoogled-chromium with protections
+        run: |
+          # Copy build configurations
+          cp chromium/build/config_manager.py build/
+          cp chromium/ungoogled-chromium/BUILD.gn build/src/
+          cp chromium/ungoogled-chromium/downloads.ini ./
+          
+          # Setup build directories
+          mkdir -p build/download_cache
+          mkdir -p build/src/out/Default
+          
+          # Download and unpack source
+          ./utils/downloads.py retrieve -i downloads.ini -c build/download_cache
+          ./utils/downloads.py unpack -i downloads.ini -c build/download_cache build/src
+          
+          # Apply protection features
+          ./utils/prune_binaries.py build/src pruning.list
+          ./utils/patches.py apply build/src patches
+          ./utils/domain_substitution.py apply -r domain_regex.list -f domain_substitution.list -c build/domsubcache.tar.gz build/src
+          
+          # Build GN and generate files
+          cd build/src
+          ./tools/gn/bootstrap/bootstrap.py -o out/Default/gn
+          cp ../../flags.gn out/Default/args.gn
+          ./out/Default/gn gen out/Default
+          
+          # Build with all protections
+          ninja -C out/Default chrome chromedriver
+
+      - name: Verify protections
+        run: |
+          python3 tools/verify_protections.py
+          python3 tools/verify_fingerprint.py
+          python3 tools/verify_hardware_mask.py
+
+      - name: Generate protection report
+        run: |
+          python3 tools/monitor_actions.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: protected-chromium-build
+          path: |
+            build/src/out/Default/chrome
+            build/src/out/Default/chromedriver
+            build/protection_state.json
+            actions_report.json
+
+      - name: Verify build integrity
+        run: |
+          echo "Verifying build integrity and protection features..."
+          if [ -f "build/src/out/Default/chrome" ]; then
+            echo "✓ Main binary built successfully"
+          else
+            echo "✗ Main binary build failed"
+            exit 1
+          fi

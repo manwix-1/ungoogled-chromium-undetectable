@@ -1,0 +1,37 @@
+--- a/chrome/browser/ungoogled_flag_entries.h
++++ b/chrome/browser/ungoogled_flag_entries.h
+@@ +180,6 +180,35 @@
+     {"enable-fingerprinting-protection",
+     "Fingerprinting Protection",
+    "Master switch for all fingerprinting protections. Individual protections can be configured below. ungoogled-chromium flag.",
+    kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingProtection)},
++    
++    {"fingerprinting-canvas-protection",
++     "Canvas Fingerprinting Protection",
++     "Adds noise to canvas operations and normalizes canvas properties to prevent fingerprinting. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingCanvasProtection)},
++    
++    {"fingerprinting-webgl-protection", 
++     "WebGL Fingerprinting Protection",
++     "Normalizes WebGL parameters and adds noise to WebGL operations. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingWebGLProtection)},
++    
++    {"fingerprinting-audio-protection",
++     "Audio API Protection",
++     "Adds noise to audio operations and normalizes audio context properties. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingAudioProtection)},
++    
++    {"fingerprinting-client-rects-protection",
++     "Client Rects Protection",
++     "Rounds client rect values and normalizes font metrics. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingClientRectsProtection)},
++    
++    {"fingerprinting-hardware-protection",
++     "Hardware Info Protection",
++     "Normalizes hardware-related APIs like performance.memory and navigator.hardwareConcurrency. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingHardwareProtection)},
++    
++    {"fingerprinting-network-protection",
++     "Network Info Protection",
++     "Normalizes network-related APIs and WebRTC behavior. ungoogled-chromium flag.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kFingerprintingNetworkProtection)},

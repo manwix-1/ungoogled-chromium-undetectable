@@ -1,0 +1,25 @@
+--- a/third_party/blink/renderer/core/dom/element.cc
++++ b/third_party/blink/renderer/core/dom/element.cc
+@@ +150,6 +150,40 @@ DOMRectList* Element::getClientRects() const {
++  if (RuntimeEnabledFeatures::FingerprintingClientRectsProtection()) {
++    // Round all rect values to prevent sub-pixel fingerprinting
++    const float kPrecision = 2.0f; // Round to 2 decimal places
++    
++    DOMRectList* rects = originalGetClientRects();
++    for (unsigned i = 0; i < rects->length(); ++i) {
++      DOMRect* rect = rects->item(i);
++      rect->setX(round(rect->x() * kPrecision) / kPrecision);
++      rect->setY(round(rect->y() * kPrecision) / kPrecision);
++      rect->setWidth(round(rect->width() * kPrecision) / kPrecision);
++      rect->setHeight(round(rect->height() * kPrecision) / kPrecision);
++    }
++    return rects;
++  }
+
+--- a/third_party/blink/renderer/core/style/computed_style.cc
++++ b/third_party/blink/renderer/core/style/computed_style.cc
+@@ +200,6 +200,25 @@ float ComputedStyle::getFontMetrics() const {
++  if (RuntimeEnabledFeatures::FingerprintingClientRectsProtection()) {
++    // Normalize font metrics
++    return StandardizeFontMetrics(original_metrics);
++  }

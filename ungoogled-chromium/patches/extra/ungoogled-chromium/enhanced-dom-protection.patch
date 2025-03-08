@@ -1,0 +1,40 @@
+--- a/third_party/blink/renderer/core/dom/document.cc
++++ b/third_party/blink/renderer/core/dom/document.cc
+@@ +150,6 +150,35 @@ DOMTimestamp Document::domTimestamp() const {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Return standardized timing info
++    static const double kStandardLoadTime = 100.0;
++    return kStandardLoadTime;
++  }
+
+@@ +200,6 +200,30 @@ CSSStyleDeclaration* Document::defaultView() {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Normalize computed styles
++    auto* style = MakeGarbageCollected<CSSStyleDeclaration>();
++    style->setProperty("font-family", "Arial", "");
++    style->setProperty("color-gamut", "srgb", "");
++    style->setProperty("forced-colors", "none", "");
++    style->setProperty("dynamic-range", "standard", "");
++    return style;
++  }
+
+--- a/third_party/blink/renderer/core/css/media_query_evaluator.cc
++++ b/third_party/blink/renderer/core/css/media_query_evaluator.cc
+@@ +150,6 +150,40 @@ bool MediaQueryEvaluator::Eval() {
++  if (RuntimeEnabledFeatures::FingerprintingProtection()) {
++    // Standardize media query responses
++    if (expression->MediaFeature() == "prefers-color-scheme")
++      return "light";
++    if (expression->MediaFeature() == "prefers-reduced-motion")
++      return "no-preference";
++    if (expression->MediaFeature() == "prefers-contrast")
++      return "no-preference";
++    if (expression->MediaFeature() == "prefers-reduced-transparency")
++      return "no-preference";
++    if (expression->MediaFeature() == "color-gamut")
++      return "srgb";
++    if (expression->MediaFeature() == "dynamic-range")
++      return "standard";
++    if (expression->MediaFeature() == "resolution")
++      return "96dpi";
++  }

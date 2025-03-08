@@ -1,0 +1,55 @@
+--- a/third_party/blink/renderer/modules/battery/battery_manager.cc
++++ b/third_party/blink/renderer/modules/battery/battery_manager.cc
+@@ +120,6 +120,19 @@ bool BatteryManager::charging() const {
++  if (RuntimeEnabledFeatures::FingerprintingAPIProtection()) {
++    // Always return standard battery status
++    return true;
++  }
+   return charging_;
+ }
+
++double BatteryManager::chargingTime() const {
++  if (RuntimeEnabledFeatures::FingerprintingAPIProtection()) {
++    return 0.0;  // Fully charged
++  }
++  return charging_time_;
++}
++
++double BatteryManager::level() const {
++  if (RuntimeEnabledFeatures::FingerprintingAPIProtection()) {
++    return 1.0;  // Full battery
++  }
++  return level_;
++}
+
+--- a/third_party/blink/renderer/modules/sensor/sensor.cc
++++ b/third_party/blink/renderer/modules/sensor/sensor.cc
+@@ +150,6 +150,31 @@ void Sensor::UpdateSensorReading() {
++  if (RuntimeEnabledFeatures::FingerprintingAPIProtection()) {
++    // Normalize sensor readings
++    switch (type_) {
++      case SensorType::kAccelerometer:
++        // Return standard gravity
++        reading_->setX(0.0);
++        reading_->setY(0.0);
++        reading_->setZ(-9.81);
++        break;
++      
++      case SensorType::kGyroscope:
++        // No rotation
++        reading_->setX(0.0);
++        reading_->setY(0.0);
++        reading_->setZ(0.0);
++        break;
++        
++      case SensorType::kAmbientLight:
++        // Standard indoor lighting
++        reading_->setIlluminance(250.0);
++        break;
++        
++      default:
++        // Zero other sensors
++        reading_->Reset();
++    }
++    return;
++  }

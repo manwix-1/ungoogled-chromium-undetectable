@@ -1,0 +1,51 @@
+# Enhanced V8 engine protections for anti-fingerprinting
+
+--- a/v8/src/execution/isolate.cc
++++ b/v8/src/execution/isolate.cc
+@@ -223,6 +223,35 @@ void Isolate::InitializeDefaultEagerCompilationData() {
++  if (base::FeatureList::IsEnabled(features::kEnhancedPrivacy)) {
++    RandomizeV8Environment();
++    NormalizeExecutionTiming();
++    ModifyJITBehavior();
++    HideDebuggerTraces();
++  }
++}
+
+void Isolate::EnhancePrivacy() {
+  // Normalize V8 behavior
+  RandomizeV8Environment();
+  NormalizeExecutionTiming();
+  ModifyJITBehavior();
+  HideDebuggerTraces();
+}
+
+void Isolate::RandomizeV8Environment() {
+  // Consistent heap configuration
+  heap_->ConfigureStandardLimits();
+  
+  // Normalize stack traces
+  stack_guard_->StandardizeStackBehavior();
+  
+  // Hide V8 specific features
+  RemoveV8Tags();
+  
+  // Standardize error messages
+  NormalizeErrorMessages();
+}
+
+void Isolate::NormalizeExecutionTiming() {
+  // Add controlled timing variations
+  execution_timing_->EnableRandomization();
+  execution_timing_->SetMaxJitter(0.1);  // 10% maximum timing variation
+  
+  // Standardize async behavior
+  microtask_queue_->NormalizeProcessing();
+}
+
+void Isolate::ModifyJITBehavior() {
+  // Randomize JIT compilation thresholds
+  compilation_stats_->RandomizeThresholds();
+  
+  // Modify optimization behavior
+  optimizer_->SetRandomizedHeuristics();
+ }

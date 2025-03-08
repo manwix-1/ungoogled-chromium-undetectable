@@ -1,0 +1,33 @@
+--- a/third_party/blink/renderer/core/timing/performance.cc
++++ b/third_party/blink/renderer/core/timing/performance.cc
+@@ +180,6 +180,20 @@ DOMHighResTimeStamp Performance::now() const {
++  if (RuntimeEnabledFeatures::FingerprintingTimingProtection()) {
++    // Reduce timing precision to prevent fingerprinting
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    
++    // Round to nearest 100ms and add small random noise
++    DOMHighResTimeStamp time = time_origin_.since_origin();
++    time = std::round(time / 100.0) * 100.0;
++    
++    // Add random noise between -5ms and +5ms
++    std::uniform_real_distribution<> noise(-5.0, 5.0);
++    time += noise(gen);
++    
++    return time;
++  }
+
+--- a/third_party/blink/renderer/core/frame/window_or_worker_global_scope.cc
++++ b/third_party/blink/renderer/core/frame/window_or_worker_global_scope.cc
+@@ +220,6 +220,15 @@ int WindowOrWorkerGlobalScope::setTimeout(
+     const ScriptValue& handler,
+     const Vector<ScriptValue>& arguments) {
++  if (RuntimeEnabledFeatures::FingerprintingTimingProtection()) {
++    // Add random delay to setTimeout to prevent timing attacks
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    std::uniform_int_distribution<> noise(0, 10);
++    
++    // Add 0-10ms random delay
++    timeout_in_ms += noise(gen);
++  }

@@ -1,0 +1,53 @@
+# Minimal build configuration
+is_debug = false
+is_component_build = false
+symbol_level = 0
+blink_symbol_level = 0
+v8_symbol_level = 0
+
+# Disable features not needed for Playwright
+enable_nacl = false
+enable_remoting = false
+enable_reporting = false
+enable_service_discovery = false
+enable_mdns = false
+enable_printing = false
+enable_basic_printing = false
+enable_print_preview = false
+enable_spellcheck = false
+rtc_use_x11 = false
+
+# Performance optimizations
+use_thin_lto = true
+use_lld = true
+use_gold = false
+treat_warnings_as_errors = false
+
+# Required for Playwright
+enable_playwright = true
+
+# System configurations
+use_system_libjpeg=true
+use_system_harfbuzz=true
+
+# Security features
+enable_sandbox=true
+enable_reading_list=false
+enable_service_discovery=false
+enable_mdns=false
+
+# Our custom features
+enable_fingerprinting_protection=true
+enable_advanced_timing_protection=true
+enable_behavior_simulation=true
+enable_automation_resistance=true
+
+# Development build settings
+is_component_build=true  # Faster incremental builds
+is_debug=false
+symbol_level=0
+blink_symbol_level=0
+
+# Enable build caching
+cc_wrapper="ccache"
+use_ccache=true

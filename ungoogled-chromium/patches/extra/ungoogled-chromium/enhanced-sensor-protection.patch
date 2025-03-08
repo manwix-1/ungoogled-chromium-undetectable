@@ -1,0 +1,31 @@
+--- a/third_party/blink/renderer/modules/sensor/sensor_reading.cc
++++ b/third_party/blink/renderer/modules/sensor/sensor_reading.cc
+@@ +150,6 +150,45 @@ void Sensor::UpdateReading() {
++  if (RuntimeEnabledFeatures::FingerprintingSensorProtection()) {
++    auto* protection_manager = ungoogled::FingerprintingProtectionManager::GetInstance();
++    auto config = protection_manager->GetEffectiveConfig(GetSecurityOrigin()->Domain());
++    
++    if (config.sensors.normalize_sensor_readings) {
++      switch (type_) {
++        case kTypeAccelerometer:
++          reading_.accelerometer.x = NormalizeWithNoise(reading_.accelerometer.x);
++          reading_.accelerometer.y = NormalizeWithNoise(reading_.accelerometer.y);
++          reading_.accelerometer.z = NormalizeWithNoise(reading_.accelerometer.z);
++          break;
++          
++        case kTypeGyroscope:
++          reading_.gyroscope.x = NormalizeWithNoise(reading_.gyroscope.x);
++          reading_.gyroscope.y = NormalizeWithNoise(reading_.gyroscope.y);
++          reading_.gyroscope.z = NormalizeWithNoise(reading_.gyroscope.z);
++          break;
++          
++        case kTypeAmbientLight:
++          reading_.ambient_light = 500.0;  // Standard office lighting
++          break;
++          
++        case kTypeProximity:
++          reading_.proximity = false;  // Standard "far" state
++          break;
++      }
++    }
++  }

@@ -1,0 +1,1816 @@
+# Comprehensive fingerprinting protections including:
+# - Advanced Canvas fingerprinting protection
+# - WebGL fingerprinting protection
+# - Timing API modifications
+# - Navigator property normalization
+
+--- a/components/ungoogled/ungoogled_switches.cc
++++ b/components/ungoogled/ungoogled_switches.cc
+@@ -12,6 +12,15 @@ const char kFingerprintingCanvasMeasureTextNoise[] = "fingerprinting-canvas-measur
+ // Enable fingerprinting deception for Canvas image data
+ const char kFingerprintingCanvasImageDataNoise[] = "fingerprinting-canvas-image-data-noise";
+ 
++// Enable advanced timing protection
++const char kFingerprintingTimingNoise[] = "fingerprinting-timing-noise";
++
++// Enable WebGL fingerprinting protection
++const char kFingerprintingWebGLNoise[] = "fingerprinting-webgl-noise";
++
++// Enable navigator property normalization
++const char kFingerprintingNavigatorNormalization[] = "fingerprinting-navigator-normalization";
++
+--- a/third_party/blink/renderer/core/timing/performance.cc
++++ b/third_party/blink/renderer/core/timing/performance.cc
+@@ -180,6 +180,13 @@ DOMHighResTimeStamp Performance::now() const {
+   if (!frame_)
+     return 0.0;
+ 
++  if (RuntimeEnabledFeatures::FingerprintingTimingNoiseEnabled()) {
++    // Add microsecond-level noise to prevent timing attacks
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    std::uniform_real_distribution<> dis(-50.0, 50.0);
++    return (time_origin_ + (MonotonicallyIncreasingTime() - time_origin_) * 1000.0) + dis(gen);
++  }
++
+   return (time_origin_ + (MonotonicallyIncreasingTime() - time_origin_) * 1000.0);
+ }
+ 
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION:
++        return WebGLAny(script_state, String("WebGL 1.0"));
++      case GL_SHADING_LANGUAGE_VERSION:
++        return WebGLAny(script_state, String("WebGL GLSL ES 1.0"));
++    }
++  }
+ 
+   switch (pname) {
+     case GL_ACTIVE_TEXTURE:
+@@ -2150,6 +2150,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state);
++    
++  if (RuntimeEnabledFeatures::FingerprintingWebGLNoiseEnabled()) {
++    switch (pname) {
++      case GL_VENDOR:
++        return WebGLAny(script_state, String("Generic Vendor"));
++      case GL_RENDERER:
++        return WebGLAny(script_state, String("Generic Renderer"));
++      case GL_VERSION

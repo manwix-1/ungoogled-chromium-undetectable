@@ -1,0 +1,70 @@
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ -125,6 +125,15 @@ String Navigator::userAgent() const {
+   if (!frame_)
+     return default_user_agent;
+ 
++  if (RuntimeEnabledFeatures::FingerprintingNavigatorNormalization()) {
++    // Return normalized UA string
++    return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
++           "AppleWebKit/537.36 (KHTML, like Gecko) "
++           "Chrome/120.0.0.0 Safari/537.36";
++  }
++
+   return frame_->GetUserAgent();
+ }
+ 
++uint8_t Navigator::hardwareConcurrency() const {
++  // Always return 4 cores to prevent CPU fingerprinting
++  return 4;
++}
++
++float Navigator::deviceMemory() const {
++  // Report standard 8GB to prevent memory fingerprinting
++  return 8.0;
++}
+
+--- a/third_party/blink/renderer/modules/webaudio/audio_context.cc
++++ b/third_party/blink/renderer/modules/webaudio/audio_context.cc
+@@ +150,6 +150,18 @@ AudioBuffer* AudioContext::createBuffer(unsigned numberOfChannels,
+                                        ExceptionState& exception_state) {
++  if (RuntimeEnabledFeatures::FingerprintingAudioNormalization()) {
++    // Add subtle noise to audio buffer
++    for (unsigned i = 0; i < numberOfChannels; ++i) {
++      float* channel_data = buffer->getChannelData(i);
++      for (unsigned j = 0; j < length; ++j) {
++        static thread_local std::random_device rd;
++        static thread_local std::mt19937 gen(rd());
++        std::uniform_real_distribution<float> noise(-0.000001f, 0.000001f);
++        channel_data[j] += noise(gen);
++      }
++    }
++  }
+   return buffer;
+ }
+
+--- a/third_party/blink/renderer/core/html/canvas/canvas_rendering_context.cc
++++ b/third_party/blink/renderer/core/html/canvas/canvas_rendering_context.cc
+@@ +210,6 +210,25 @@ ImageData* CanvasRenderingContext::getImageData(int sx, int sy,
+                                                 int sw, int sh,
+                                                 ExceptionState& exception_state) {
++  if (RuntimeEnabledFeatures::FingerprintingCanvasNoise()) {
++    ImageData* image_data = CreateImageData(sw, sh);
++    unsigned char* data = image_data->data();
++    
++    // Apply sophisticated noise pattern
++    static thread_local std::random_device rd;
++    static thread_local std::mt19937 gen(rd());
++    std::uniform_int_distribution<> noise(0, 1);
++    
++    for (int i = 0; i < sw * sh * 4; i += 4) {
++      // Modify RGB values slightly while preserving image appearance
++      if (noise(gen)) {
++        data[i] = std::clamp(data[i] + (noise(gen) ? 1 : -1), 0, 255);
++        data[i+1] = std::clamp(data[i+1] + (noise(gen) ? 1 : -1), 0, 255);
++        data[i+2] = std::clamp(data[i+2] + (noise(gen) ? 1 : -1), 0, 255);
++        // Don't modify alpha channel to maintain visibility
++      }
++    }
++    return image_data;
++  }

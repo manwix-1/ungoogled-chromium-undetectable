@@ -1,0 +1,56 @@
+--- a/third_party/blink/renderer/modules/storage/storage_manager.cc
++++ b/third_party/blink/renderer/modules/storage/storage_manager.cc
+@@ +180,6 +180,15 @@ ScriptPromise StorageManager::estimate(ScriptState* script_state) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Return standardized storage estimates to prevent fingerprinting
++    StorageEstimate* estimate = StorageEstimate::Create();
++    estimate->setUsage(0);  // Current usage always shows as empty
++    estimate->setQuota(10737418240);  // Standard 10GB quota
++    
++    auto* result = MakeGarbageCollected<StorageEstimateResolver>(script_state);
++    result->Resolve(estimate);
++    return result->Promise();
++  }
+
+--- a/storage/browser/quota/quota_manager.cc
++++ b/storage/browser/quota/quota_manager.cc
+@@ +420,6 +420,15 @@ void QuotaManager::GetUsageAndQuota(
+     const scoped_refptr<base::SingleThreadTaskRunner>& callback_runner,
+     UsageAndQuotaCallback callback) {
++  if (base::FeatureList::IsEnabled(features::kFingerprintingWebGLProtection)) {
++    // Normalize storage quotas across all origins
++    int64_t standardized_quota = 10737418240;  // 10GB
++    callback_runner->PostTask(
++        FROM_HERE,
++        base::BindOnce(std::move(callback),
++                      blink::mojom::QuotaStatusCode::kOk,
++                      0,  // Usage
++                      standardized_quota));  // Quota
++    return;
++  }
+
+--- a/third_party/blink/renderer/modules/storage/navigator_storage.cc
++++ b/third_party/blink/renderer/modules/storage/navigator_storage.cc
+@@ +80,6 +80,16 @@ ScriptPromise NavigatorStorage::persist(ScriptState* script_state) {
++  if (RuntimeEnabledFeatures::FingerprintingWebGLProtection()) {
++    // Always return false for persistence to prevent storage-based fingerprinting
++    auto* resolver = MakeGarbageCollected<ScriptPromiseResolver>(script_state);
++    ScriptPromise promise = resolver->Promise();
++    
++    resolver->Resolve(false);
++    return promise;
++  }
+
+--- a/storage/browser/quota/quota_settings.cc
++++ b/storage/browser/quota/quota_settings.cc
+@@ +150,6 +150,14 @@ int64_t QuotaSettings::GetPerHostQuota() const {
++  if (base::FeatureList::IsEnabled(features::kFingerprintingWebGLProtection)) {
++    // Return standardized per-host quota
++    return 2147483648;  // 2GB
++  }
+
+@@ +180,6 +180,14 @@ int64_t QuotaSettings::GetPerStorageTypeQuota() const {
++  if (base::FeatureList::IsEnabled(features::kFingerprintingWebGLProtection)) {
++    // Return standardized per-storage-type quota
++    return 5368709120;  // 5GB
++  }

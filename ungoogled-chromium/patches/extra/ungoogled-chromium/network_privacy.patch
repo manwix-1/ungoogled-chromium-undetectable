@@ -1,0 +1,18 @@
+void NetworkPrivacyManager::EnhancePrivacy() {
+  // Normalize network behavior
+  StandardizeNetworkTimings();
+  RandomizeIPProbing();
+  HideBrowserOrigin();
+  
+  // Protect against timing attacks
+  connection_timing_->AddJitter();
+  request_timing_->NormalizeLatency();
+  
+  // Standardize headers
+  NormalizeHeaders();
+  RemoveTrackingHeaders();
+  
+  // DNS/WebRTC protection
+  DisableWebRTCLeaks();
+  NormalizeDNSBehavior();
+}
