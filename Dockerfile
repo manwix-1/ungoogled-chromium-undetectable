@@ -22,11 +22,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Download latest Ungoogled Chromium
+# Download latest Ungoogled Chromium (134.0.6998.35-1)
 RUN mkdir -p /opt/chrome
 WORKDIR /opt/chrome
-RUN wget $(curl -s https://api.github.com/repos/ungoogled-software/ungoogled-chromium-binaries/releases/latest | \
-    grep "browser_download_url.*linux.*64.*tar\.xz" | cut -d '"' -f 4) -O chrome.tar.xz \
+RUN wget https://github.com/ungoogled-software/ungoogled-chromium-binaries/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz -O chrome.tar.xz \
     && tar xf chrome.tar.xz \
     && rm chrome.tar.xz
 
