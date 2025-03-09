@@ -19,14 +19,18 @@ RUN apt-get update && apt-get install -y \
     libxtst6 \
     git \
     curl \
-    unzip \
+    tar \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and install Ungoogled Chromium AppImage
-RUN wget https://github.com/ungoogled-software/ungoogled-chromium-binaries/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1.AppImage \
-    && echo "4caf1422187185afd1cb1631880119906428d0c74b0228fafc79c901a64b5da7 ungoogled-chromium_134.0.6998.35-1.AppImage" | sha256sum --check \
-    && chmod +x ungoogled-chromium_134.0.6998.35-1.AppImage \
-    && mv ungoogled-chromium_134.0.6998.35-1.AppImage /usr/local/bin/ungoogled-chromium
+# Download and install Ungoogled Chromium portable Linux version
+RUN wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
+    && echo "f20616cebbaac86ee357a7037da8e0450f0e5100e0ee3f09e53232490ddb722a ungoogled-chromium_134.0.6998.35-1_linux.tar.xz" | sha256sum --check \
+    && tar xf ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
+    && mkdir -p /usr/local/ungoogled-chromium \
+    && mv ungoogled-chromium_134.0.6998.35-1_linux/* /usr/local/ungoogled-chromium/ \
+    && ln -sf /usr/local/ungoogled-chromium/chrome /usr/local/bin/ungoogled-chromium \
+    && rm ungoogled-chromium_134.0.6998.35-1_linux.tar.xz
 
 # Set up protection layers
 COPY components/ungoogled /opt/protection_layers/

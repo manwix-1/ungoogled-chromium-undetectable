@@ -5,21 +5,21 @@ set -e
 mkdir -p downloads
 cd downloads
 
-# Download AppImage
-echo "Downloading Ungoogled Chromium AppImage..."
-wget https://github.com/ungoogled-software/ungoogled-chromium-binaries/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1.AppImage
+# Download tar.xz
+echo "Downloading Ungoogled Chromium portable Linux archive..."
+wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz
 
 # Verify SHA256 checksum
 echo "Verifying checksum..."
-echo "4caf1422187185afd1cb1631880119906428d0c74b0228fafc79c901a64b5da7 ungoogled-chromium_134.0.6998.35-1.AppImage" | sha256sum --check
+echo "f20616cebbaac86ee357a7037da8e0450f0e5100e0ee3f09e53232490ddb722a ungoogled-chromium_134.0.6998.35-1_linux.tar.xz" | sha256sum --check
 
-# Make executable
-chmod +x ungoogled-chromium_134.0.6998.35-1.AppImage
+# Extract archive
+tar xf ungoogled-chromium_134.0.6998.35-1_linux.tar.xz
 
 # Optional: Move to system location
 sudo mkdir -p /opt/ungoogled-chromium
-sudo mv ungoogled-chromium_134.0.6998.35-1.AppImage /opt/ungoogled-chromium/
-sudo ln -sf /opt/ungoogled-chromium/ungoogled-chromium_134.0.6998.35-1.AppImage /usr/local/bin/ungoogled-chromium
+sudo mv ungoogled-chromium_134.0.6998.35-1_linux/* /opt/ungoogled-chromium/
+sudo ln -sf /opt/ungoogled-chromium/chrome /usr/local/bin/ungoogled-chromium
 
 # Clean up
 cd ..
