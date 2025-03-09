@@ -1,0 +1,27 @@
+--- a/components/ungoogled/process/process_isolation.h
++++ b/components/ungoogled/process/process_isolation.h
+@@ -15,6 +15,26 @@ class ProcessIsolation {
+         memory_usage_.NormalizeFootprint();
+         memory_usage_.AddRandomVariation(1024 * 1024);  // 1MB variation
+     }
++    
++    // Enhanced process isolation
++    isolation_engine_.Configure({
++        .memory_protection = {
++            .randomize_layout: true,
++            .guard_pages: true,
++            .heap_pattern_masking: true
++        },
++        .thread_protection = {
++            .randomize_scheduling: true,
++            .mask_thread_ids: true,
++            .normalize_priorities: true
++        },
++        .syscall_masking = {
++            .intercept_patterns: true,
++            .timing_randomization: true,
++            .behavior_normalization: true,
++            .entropy_level: 0.85
++        }
++    });
+ };

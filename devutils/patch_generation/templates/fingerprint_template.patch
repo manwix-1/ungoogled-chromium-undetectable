@@ -1,0 +1,25 @@
+--- a/components/ungoogled/fingerprint/{{ COMPONENT }}.cc
++++ b/components/ungoogled/fingerprint/{{ COMPONENT }}.cc
+@@ -0,0 +1,50 @@
+{{ DEPENDENCIES }}
+
+namespace ungoogled {
+
+class {{ COMPONENT }}Protection {
+public:
+    void Initialize() {
+        protection_config_ = {
+            .randomization = true,
+            .noise_level = 0.02,
+            .timing_protection = true,
+            .pattern_masking = true
+        };
+        
+        {{ MODIFICATIONS }}
+    }
+
+private:
+    ProtectionConfig protection_config_;
+};
+
+} // namespace ungoogled

@@ -5,8 +5,6 @@ public:
         double mouse_precision;
         double reaction_time;
         double attention_span;
-        std::vector<TimeWindow> active_hours;
-        LocationData geo_pattern;
     };
 
     void SimulateHumanBehavior() {

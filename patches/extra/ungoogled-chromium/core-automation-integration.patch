@@ -1,0 +1,32 @@
+--- a/components/ungoogled/core_automation/fingerprint_orchestrator.h
++++ b/components/ungoogled/core_automation/fingerprint_orchestrator.h
+@@ -30,6 +30,15 @@ class FingerprintOrchestrator {
+     bool InitializeShadowTLS();
+ 
+  private:
++    // Enhanced protection initialization
++    void InitializeAdvancedProtection() {
++        protection_manager_.Configure({
++            .quantum_resistance: true,
++            .neural_simulation: true,
++            .deep_learning_evasion: true,
++            .protection_level: 0.9
++        });
++    }
+ 
+--- a/components/ungoogled/core_automation/graphics_fingerprint_randomizer.cc
++++ b/components/ungoogled/core_automation/graphics_fingerprint_randomizer.cc
+@@ -25,6 +25,14 @@ void GraphicsFingerprintRandomizer::PatchWebGLContext(
+             "GL_WEBGL_depth_texture"
+         };
+         context->SetAvailableExtensions(standard_extensions);
++        
++        // Enhanced WebGL protection
++        webgl_protector_.Initialize({
++            .context_randomization: true,
++            .shader_obfuscation: true,
++            .parameter_masking: true,
++            .capability_normalization: true
++        });
+     }
+ }

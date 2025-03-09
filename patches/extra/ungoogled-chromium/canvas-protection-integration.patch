@@ -1,0 +1,23 @@
+--- a/components/ungoogled/graphics/canvas_protection.h
++++ b/components/ungoogled/graphics/canvas_protection.h
+@@ -25,6 +25,22 @@ class CanvasProtection {
+         color_handler_.StandardizeColorSpace();
+         color_handler_.RandomizeAlphaValues(0.99, 1.0);
+     }
++    
++    // Enhanced canvas protection
++    canvas_protector_.Initialize({
++        .pixel_manipulation = {
++            .noise_pattern: "perlin",
++            .intensity: 0.02,
++            .distribution: "gaussian",
++            .spatial_frequency: 0.1
++        },
++        .context_protection = {
++            .mask_capabilities: true,
++            .randomize_parameters: true,
++            .normalize_behavior: true,
++            .protection_level: 0.9
++        }
++    });
+ };

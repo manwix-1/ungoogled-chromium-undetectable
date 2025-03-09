@@ -1,0 +1,24 @@
+--- a/components/ungoogled/automation/{{ COMPONENT }}.cc
++++ b/components/ungoogled/automation/{{ COMPONENT }}.cc
+@@ -0,0 +1,45 @@
+{{ DEPENDENCIES }}
+
+namespace ungoogled {
+
+class {{ COMPONENT }}AutomationProtection {
+public:
+    void ApplyProtection() {
+        automation_config_ = {
+            .evasion_level = "maximum",
+            .behavior_simulation = true,
+            .timing_randomization = true
+        };
+        
+        {{ MODIFICATIONS }}
+    }
+
+private:
+    AutomationConfig automation_config_;
+};
+
+} // namespace ungoogled

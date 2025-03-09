@@ -1,56 +1,58 @@
 #ifndef COMPONENTS_UNGOOGLED_CORE_AUTOMATION_AUTOMATION_EVADER_H_
 #define COMPONENTS_UNGOOGLED_CORE_AUTOMATION_AUTOMATION_EVADER_H_
 
-#include "base/memory/ref_counted.h"
-#include "content/public/browser/devtools_agent_host.h"
+#include "base/memory/weak_ptr.h"
+#include "components/ungoogled/core_automation/evasion_config.h"
 
 namespace ungoogled {
 
-class AutomationEvader : public base::RefCountedThreadSafe<AutomationEvader> {
- public:
-  struct EvaderConfig {
-    // CDP trace removal
-    struct {
-      bool remove_protocol_handlers;  // Remove CDP handlers
-      bool modify_runtime_flags;      // Modify runtime flags
-      bool hide_debugger;            // Hide debugger presence
-      bool spoof_execution;          // Spoof execution context
-    } cdp;
+class AutomationEvader {
+public:
+    struct EvaderConfig {
+        struct CDPConfig {
+            bool remove_protocol_handlers = true;
+            bool hide_debugger = true;
+            bool mask_websocket = true;
+            bool randomize_ids = true;
+        } cdp;
 
-    // Browser behavior
-    struct {
-      bool normalize_timing;          // Normalize timing behavior
-      bool modify_heap;              // Modify heap behavior
-      bool randomize_performance;     // Randomize performance
-      bool vary_stack_traces;        // Vary stack traces
-    } behavior;
+        struct WebDriverConfig {
+            bool remove_properties = true;
+            bool mask_navigator = true;
+            bool spoof_permissions = true;
+        } webdriver;
 
-    // Property protection
-    struct {
-      bool protect_navigator;         // Protect navigator props
-      bool modify_runtime;           // Modify runtime props
-      bool hide_automation;          // Hide automation flags
-      bool spoof_plugins;           // Spoof plugin data
-    } properties;
-  };
+        struct BehaviorConfig {
+            bool randomize_timing = true;
+            bool simulate_human = true;
+            double jitter_ms = 50.0;
+        } behavior;
 
-  bool Initialize(const EvaderConfig& config);
-  
-  // Core evasion
-  void RemoveCDPTraces();
-  void ModifyRuntimeEnvironment();
-  void HideAutomationFlags();
-  
-  // Advanced protection
-  void PatchNavigatorProperties();
-  void ModifyStackTraces();
-  void RandomizeTimingBehavior();
+        struct APIConfig {
+            bool mask_automation_apis = true;
+            bool protect_stack_traces = true;
+            bool hide_debugging_props = true;
+        } api;
+    };
+
+    bool Initialize(const EvaderConfig& config);
+    void RemoveCDPTraces();
+    void MaskWebDriver();
+    void RandomizeBehavior();
+    void ProtectAutomationAPIs();
 
 private:
-  EvaderConfig config_;
-  std::unique_ptr<RandomNumberGenerator> rng_;
+    void RemoveDebuggerProperties();
+    void MaskNavigatorProperties();
+    void RandomizeExecutionTiming();
+    void HideStackTraces();
+    void ProtectSensitiveAPIs();
+
+    EvaderConfig config_;
+    std::unique_ptr<base::RandomNumberGenerator> rng_;
+    base::WeakPtrFactory<AutomationEvader> weak_factory_{this};
 };
 
-}  // namespace ungoogled
+} // namespace ungoogled
 
-#endif
+#endif // COMPONENTS_UNGOOGLED_CORE_AUTOMATION_AUTOMATION_EVADER_H_

@@ -1,0 +1,28 @@
+--- a/components/ungoogled/automation/advanced_automation_resistance.cc
++++ b/components/ungoogled/automation/advanced_automation_resistance.cc
+@@ -25,6 +25,24 @@ void AdvancedAutomationResistance::ApplyResistance() {
+             .normalize_navigator = true
+         });
+     }
++    
++    // Enhanced automation resistance
++    resistance_engine_.Initialize({
++        .behavioral_simulation = {
++            .human_like_timing: true,
++            .natural_movement: true,
++            .focus_patterns: true,
++            .entropy_level: 0.9
++        },
++        .detection_evasion = {
++            .mask_automation_apis: true,
++            .hide_debugging_hooks: true,
++            .randomize_execution: true,
++            .protect_stack_traces: true
++        },
++        .neural_patterns = {
++            .enable_learning: true,
++            .adapt_behavior: true
++        }
++    });
+ 
+     if (config_.detection.normalize_performance) {

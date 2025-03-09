@@ -1,0 +1,27 @@
+--- a/components/ungoogled/sensors/sensor_protection.h
++++ b/components/ungoogled/sensors/sensor_protection.h
+@@ -15,6 +15,25 @@ class SensorProtection {
+         
+         sensor_timing_.RandomizeInterval(5, 15);  // 5-15ms sampling variation
+     }
++    
++    // Enhanced sensor protection
++    sensor_protector_.Initialize({
++        .motion_masking = {
++            .accelerometer: {
++                .noise_level: 0.002,
++                .pattern: "gaussian",
++                .temporal_smoothing: true
++            },
++            .gyroscope: {
++                .noise_level: 0.001,
++                .quantization: true,
++                .drift_compensation: true
++            }
++        },
++        .timing_protection = {
++            .randomize_intervals: true,
++            .interval_range: {5, 15}  // ms
++        }
++    });
+ };

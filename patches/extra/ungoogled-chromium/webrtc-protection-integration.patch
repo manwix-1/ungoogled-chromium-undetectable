@@ -1,0 +1,24 @@
+--- a/components/ungoogled/fingerprinting/protections/webrtc_protection.cc
++++ b/components/ungoogled/fingerprinting/protections/webrtc_protection.cc
+@@ -15,6 +15,18 @@ void WebRTCProtection::ProtectPeerConnection(RTCPeerConnection* connection) {
+     rtc_config.enableMdns = false;
+   }
+   
++  // Enhanced WebRTC protection
++  connection_protector_.Initialize({
++    .mask_ice_candidates = true,
++    .randomize_connection_timing = true,
++    .obfuscate_network_routes = true,
++    .protection_level = {
++      .fingerprint_resistance = 0.9,
++      .timing_protection = 0.8,
++      .identity_masking = true
++    }
++  });
++
+   // Configure advanced IP protection
+   ip_masking_.Configure({
+     .hide_private_ips = true,
+     .randomize_ice_order = true,
+     .force_proxy_only = true
+   });

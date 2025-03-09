@@ -1,0 +1,30 @@
+{
+    "patch_categories": {
+        "fingerprint": {
+            "components": ["user_agent", "canvas", "webgl", "audio", "performance"],
+            "required_includes": [
+                "components/ungoogled/protection/engine.h",
+                "components/ungoogled/fingerprint/protection.h"
+            ]
+        },
+        "automation": {
+            "components": ["detection", "evasion", "behavior"],
+            "required_includes": [
+                "components/ungoogled/automation/protection.h",
+                "components/ungoogled/behavior/simulator.h"
+            ]
+        },
+        "protection": {
+            "components": ["quantum", "neural", "metamorphic"],
+            "required_includes": [
+                "components/ungoogled/protection/advanced.h",
+                "components/ungoogled/neural/engine.h"
+            ]
+        }
+    },
+    "patch_validation": {
+        "required_tests": ["unit", "integration"],
+        "compatibility_check": true,
+        "performance_impact_threshold": 0.05
+    }
+}

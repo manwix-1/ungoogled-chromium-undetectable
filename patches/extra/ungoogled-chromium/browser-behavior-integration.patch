@@ -1,0 +1,32 @@
+--- a/components/ungoogled/behavior/browser_behavior_protection.h
++++ b/components/ungoogled/behavior/browser_behavior_protection.h
+@@ -15,6 +15,31 @@ class BrowserBehaviorProtection {
+         focus_simulator_.AddRandomBlur();
+         focus_simulator_.SimulateTabSwitching();
+     }
++    
++    // Enhanced behavior protection
++    behavior_engine_.Initialize({
++        .input_simulation = {
++            .human_timing_patterns: true,
++            .natural_movement_curves: true,
++            .focus_drift: {
++                .enabled: true,
++                .intensity: 0.2
++            }
++        },
++        .interaction_masking = {
++            .event_timing_randomization: true,
++            .gesture_naturalization: true,
++            .scroll_behavior_normalization: true
++        },
++        .automation_resistance = {
++            .pattern_learning: true,
++            .behavior_adaptation: true,
++            .detection_evasion: {
++                .level: "aggressive",
++                .methods: ["timing", "patterns", "signatures"]
++            }
++        }
++    });
+ };

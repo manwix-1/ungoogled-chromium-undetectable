@@ -1,0 +1,30 @@
+--- a/components/ungoogled/core_automation/native_protection.h
++++ b/components/ungoogled/core_automation/native_protection.h
+@@ -15,6 +15,28 @@ class NativeCodeProtection {
+             .timing_variation = 0.03,    // 3% syscall timing variation
+         });
+     }
++    
++    // Enhanced native protection
++    native_protector_.Initialize({
++        .code_obfuscation = {
++            .instruction_masking: true,
++            .control_flow_randomization: true,
++            .stack_layout_randomization: true
++        },
++        .execution_protection = {
++            .timing_normalization: true,
++            .branch_prediction_masking: true,
++            .cache_behavior_randomization: true
++        },
++        .memory_protection = {
++            .aslr_enhancement: true,
++            .guard_page_insertion: true,
++            .heap_layout_randomization: true
++        },
++        .syscall_protection = {
++            .pattern_randomization: true,
++            .timing_jitter: 0.03  // 3% variation
++        }
++    });
+ };

@@ -8,40 +8,26 @@ namespace ungoogled {
 
 class HumanEmulator {
  public:
-  struct MouseConfig {
-    // Basic movement
-    double base_speed;
-    double acceleration;
-    double deceleration;
-    
-    // AI behavior
-    bool simulate_hesitation;
-    bool add_micro_movements;
-    bool use_natural_curves;
-    
-    // Physics simulation
-    bool simulate_inertia;
-    bool add_momentum;
-    double friction_factor;
-    
-    // Randomization
-    double jitter_range;
-    double error_probability;
-    int max_correction_attempts;
+  struct CursorBehaviorConfig {
+    bool enable_neural_patterns = true;
+    struct Movement {
+      double base_speed = 1000.0;
+      double acceleration = 1.5;
+      double deceleration = 2.0;
+      struct NeuralParams {
+        double learning_rate = 0.001;
+        double adaptation_factor = 0.1;
+        int pattern_memory = 1000;
+      } neural;
+    } movement;
   };
 
-  bool Initialize(const MouseConfig& config);
-  
-  // Enhanced mouse movement methods
-  bool MoveMouseNaturally(const gfx::Point& target);
-  bool PerformHumanizedClick(const gfx::Point& target);
-  bool SimulateMouseDrag(const gfx::Point& start,
-                        const gfx::Point& end);
+  bool UpdateCursorBehavior(const CursorBehaviorConfig& config);
+  gfx::Point GetNextCursorPosition(const gfx::Point& target);
 
  private:
-  std::unique_ptr<MouseTrajectoryGenerator> trajectory_generator_;
-  std::unique_ptr<BezierCurveGenerator> curve_generator_;
-  MouseConfig config_;
+  std::unique_ptr<NeuralMovementPredictor> movement_predictor_;
+  CursorBehaviorConfig cursor_config_;
 };
 
 }  // namespace ungoogled

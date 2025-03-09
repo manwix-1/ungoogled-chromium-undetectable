@@ -1,0 +1,30 @@
+--- a/components/ungoogled/playwright/playwright_controller.cc
++++ b/components/ungoogled/playwright/playwright_controller.cc
+@@ -15,6 +15,12 @@ bool PlaywrightController::Initialize(const AutomationConfig& config) {
+     return false;
+   }
+ 
++  // Initialize neural behavior simulator
++  neural_simulator_ = std::make_unique<NeuralBehaviorSimulator>();
++  if (!neural_simulator_->Initialize(config.neural)) {
++    return false;
++  }
++
+   // Initialize fingerprint manager with enhanced protections
+   fingerprint_manager_ = std::make_unique<FingerprintManager>();
+   if (!fingerprint_manager_->Initialize(config.canvas, 
+@@ -31,6 +37,7 @@ bool PlaywrightController::HumanizedClick(int x, int y) {
+   if (!human_emulator_->IsInitialized())
+     return false;
+ 
++  neural_simulator_->PreprocessAction(ActionType::CLICK);
+   auto pattern = human_emulator_->GenerateClickPattern(x, y);
+   
+   // Apply quantum-resistant masking
+@@ -38,6 +45,7 @@ bool PlaywrightController::HumanizedClick(int x, int y) {
+     quantum_masking_->ApplyActionMask(&pattern);
+   }
+ 
++  neural_simulator_->PostprocessAction(pattern);
+   return ExecutePattern(pattern);
+ }

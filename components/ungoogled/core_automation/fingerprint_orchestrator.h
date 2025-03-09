@@ -21,8 +21,6 @@ class FingerprintOrchestrator : public base::RefCountedThreadSafe<FingerprintOrc
   struct FingerprintProfile {
     // Hardware profile
     std::string cpu_architecture;
-    int num_cores;
-    int64_t memory_size;
     std::string gpu_vendor;
     std::string gpu_renderer;
     

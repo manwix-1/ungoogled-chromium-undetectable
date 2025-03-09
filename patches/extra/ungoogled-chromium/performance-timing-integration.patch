@@ -1,0 +1,22 @@
+--- a/components/ungoogled/timing/performance_protection.h
++++ b/components/ungoogled/timing/performance_protection.h
+@@ -25,6 +25,19 @@ class PerformanceTimingProtection {
+             {"responseStart", 2.0},    // 2ms jitter
+             {"responseEnd", 1.5}       // 1.5ms jitter
+         });
++        
++        // Enhanced timing protection
++        timing_protector_.Initialize({
++            .quantum_timing = {
++                .resolution: 0.1,      // 0.1ms quantum
++                .entropy: 0.8,         // 80% randomization
++                .pattern_masking: true
++            },
++            .execution_masking = {
++                .normalize_patterns: true,
++                .add_random_delays: true,
++                .mask_cpu_features: true
++            }
++        });
+     }
+ };

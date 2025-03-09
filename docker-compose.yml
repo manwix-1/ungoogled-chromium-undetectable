@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  browser-protection:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./components:/app/components
+      - ./patches:/app/patches
+      - ./fonts:/app/fonts:ro
+      - ./certificates:/app/certificates:ro
+    environment:
+      - PROTECTION_LEVEL=HIGH
+      - ENABLE_NEURAL_EVASION=true
+      - ENABLE_QUANTUM_RESISTANT=true
+      - ENABLE_DEEP_LEARNING=true
+      - ENABLE_ADVANCED_FINGERPRINT=true
+      - ENABLE_BEHAVIOR_SIMULATION=true
+      - ENABLE_AUTOMATION_RESISTANCE=true
+      - ENABLE_WEBRTC_PROTECTION=true
+      - ENABLE_FONT_PROTECTION=true
+      - ENABLE_MEDIA_DEVICES_PROTECTION=true
+      - ENABLE_HARDWARE_CONCURRENCY_MASKING=true
+      - ENABLE_TIMEZONE_PROTECTION=true
+      - WEBGL_NOISE_VALUE=0.02
+      - CANVAS_NOISE_VALUE=0.03
+      - AUDIO_NOISE_VALUE=0.015
+      - ENABLE_PROXY_ROTATION=true
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G

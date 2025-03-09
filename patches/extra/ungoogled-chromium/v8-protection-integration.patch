@@ -1,0 +1,20 @@
+--- a/components/ungoogled/v8/enhanced_v8_protection.cc
++++ b/components/ungoogled/v8/enhanced_v8_protection.cc
+@@ -20,6 +20,15 @@ void EnhancedV8Protection::JITProtector::ConfigureCompilation(
+         instruction_scheduler_.RandomizeOrder();
+         instruction_scheduler_.AddTimingNoise(0.05);
+     }
++    
++    // Add quantum-resistant JIT protection
++    quantum_jit_.Initialize({
++        .code_layout_entropy: 0.8,
++        .timing_variance: 0.1,
++        .memory_pattern_protection: true,
++        .execution_path_randomization: true
++    });
++
++    // Enhance GC timing protection
++    gc_controller_.EnableAdvancedProtection({
++        .collection_entropy: 0.7,
++        .heap_pattern_masking: true
++    });

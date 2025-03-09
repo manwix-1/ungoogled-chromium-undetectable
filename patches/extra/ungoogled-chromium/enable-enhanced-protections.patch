@@ -1,0 +1,20 @@
+# Enable enhanced protection mechanisms
+
+--- a/components/ungoogled/core_automation/protection_orchestrator.cc
++++ b/components/ungoogled/core_automation/protection_orchestrator.cc
+@@ -15,6 +15,7 @@ void ProtectionOrchestrator::InitializeAdvancedProtections() {
+     memory_protection_->Initialize({
+         .heap = {
+             .randomize_layout = true,
++            .enable_advanced_masking = true,
+             .padding_range = 8192
+         }
+     });
+@@ -22,6 +23,7 @@ void ProtectionOrchestrator::InitializeAdvancedProtections() {
+     network_protection_->Initialize({
+         .tcp = {
+             .randomize_window = true,
++            .enable_deep_fingerprint_protection = true,
+             .window_variation = 16384
+         }
+     });

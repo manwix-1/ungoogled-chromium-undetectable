@@ -1,0 +1,12 @@
+--- a/components/ungoogled/fingerprint/COMPONENT.cc
++++ b/components/ungoogled/fingerprint/COMPONENT.cc
+@@ -LINENUM,0 +LINENUM,20
++    // Auto-generated protection
++    protection_engine_.Initialize({
++        .randomization = true,
++        .masking = true,
++        .evasion = {
++            .pattern_learning = true,
++            .adaptation = true
++        }
++    });

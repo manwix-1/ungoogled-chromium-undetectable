@@ -1,0 +1,19 @@
+--- a/components/ungoogled/memory/memory_pattern_protection.h
++++ b/components/ungoogled/memory/memory_pattern_protection.h
+@@ -15,6 +15,14 @@ class MemoryPatternProtection {
+         heap_randomizer_.EnableRandomPadding();
+         heap_randomizer_.SetPaddingRange(16, 64);
+         
++        // Enhanced memory protection
++        memory_protector_.Initialize({
++            .pattern_masking = true,
++            .allocation_randomization = true,
++            .access_pattern_obfuscation = true,
++            .timing_protection_level = 0.8
++        });
++        
+         // Advanced heap protection
+         heap_protector_.Configure({
+             .randomization_entropy: 0.9,
+             .pattern_masking: true
+         });

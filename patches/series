@@ -1,0 +1,24 @@
+# Existing patches...
+
+# Core protection patches
+extra/ungoogled-chromium/v8-protection-integration.patch
+extra/ungoogled-chromium/memory-protection-integration.patch
+extra/ungoogled-chromium/fingerprint-protection-integration.patch
+extra/ungoogled-chromium/core-automation-integration.patch
+extra/ungoogled-chromium/font-protection-integration.patch
+
+# Enhanced security patches
+extra/ungoogled-chromium/quantum-resistant-integration.patch
+extra/ungoogled-chromium/neural-simulation-integration.patch
+extra/ungoogled-chromium/deep-learning-evasion-integration.patch
+
+# Component integration patches
+extra/ungoogled-chromium/thread-pattern-protection.patch
+extra/ungoogled-chromium/graphics-fingerprint-randomization.patch
+extra/ungoogled-chromium/webgl-context-protection.patch
+
+# New protection patches
+extra/ungoogled-chromium/webrtc-protection-integration.patch
+extra/ungoogled-chromium/performance-timing-integration.patch
+extra/ungoogled-chromium/canvas-protection-integration.patch
+extra/ungoogled-chromium/automation-resistance-integration.patch

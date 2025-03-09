@@ -17,6 +17,32 @@ class CoreNetworkStack : public base::RefCountedThreadSafe<CoreNetworkStack> {
     bool direct_fallback;
   };
 
+  struct ProxyIntegrationConfig {
+    // Core integration
+    struct Integration {
+      bool system_level_integration;
+      bool app_level_integration;
+      bool browser_integration;
+      struct Hooks {
+        bool network_layer_hook;
+        bool socket_layer_hook;
+        bool dns_layer_hook;
+      } system_hooks;
+    };
+
+    // Traffic management
+    struct TrafficManagement {
+      bool traffic_classification;
+      bool protocol_detection;
+      bool dynamic_routing;
+      struct Rules {
+        bool application_rules;
+        bool protocol_rules;
+        bool domain_rules;
+      } routing;
+    };
+  };
+
   CoreNetworkStack();
   
   // Core proxy management

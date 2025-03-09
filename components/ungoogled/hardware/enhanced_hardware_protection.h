@@ -8,37 +8,56 @@ namespace ungoogled {
 
 class EnhancedHardwareProtection {
 public:
-    struct ProtectionConfig {
+    struct HardwareConfig {
         struct CPUConfig {
-            double rdtsc_variance;      // RDTSC timing variance
-            bool mask_vendor_string;    // Hide real CPU vendor
-            bool randomize_features;    // Randomize CPU features
-            double branch_variance;     // Branch timing variance
+            bool mask_instruction_timing = true;
+            bool randomize_cache_access = true;
+            bool protect_branch_prediction = true;
+            double timing_noise_percentage = 0.03;
         };
 
         struct GPUConfig {
-            bool mask_vendor;           // Hide GPU vendor
-            bool normalize_performance; // Standardize GPU metrics
-            bool randomize_extensions;  // Randomize GPU extensions
-            double precision_noise;     // WebGL precision noise
+            bool normalize_capabilities = true;
+            bool randomize_performance = true;
+            bool mask_vendor_info = true;
+            uint32_t performance_variance = 5;
         };
 
-        CPUConfig cpu;
-        GPUConfig gpu;
+        struct SensorConfig {
+            bool mask_precision = true;
+            bool add_sensor_noise = true;
+            double noise_amplitude = 0.02;
+            uint32_t sampling_variance_ms = 2;
+        };
     };
 
-    void Initialize(const ProtectionConfig& config);
-    void ApplyProtection();
-    bool ValidateProtection() const;
+    void ApplyProtection(const HardwareConfig& config) {
+        EnhanceCPUProtection(config.cpu);
+        EnhanceGPUProtection(config.gpu);
+        EnhanceSensorProtection(config.sensor);
+    }
 
 private:
-    void MaskCPUCharacteristics();
-    void NormalizeGPUBehavior();
-    void RandomizeTimingBehavior();
-    void ObfuscateHardwareFeatures();
-
-    ProtectionConfig config_;
-    std::unique_ptr<HardwareProfiler> hardware_profiler_;
+    void EnhanceCPUProtection(const HardwareConfig::CPUConfig& config) {
+        cpu_protector_.Configure({
+            .rdtsc_noise = {
+                .enabled = true,
+                .variance = 0.02,
+                .pattern = "gaussian",
+                .granularity_ns = 100
+            },
+            .cache_protection = {
+                .randomize_access = true,
+                .add_dummy_loads = true,
+                .pattern_complexity = 0.8
+            },
+            .branch_protection = {
+                .randomize_prediction = true,
+                .add_dummy_branches = true,
+                .mask_history = true
+            }
+        });
+    }
 };
 
 }  // namespace ungoogled

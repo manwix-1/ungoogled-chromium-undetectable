@@ -12,7 +12,19 @@ namespace ungoogled {
 
 class PlaywrightController {
  public:
+  struct CursorConfig {
+    bool visible_in_browser = true;
+    bool hide_system_cursor = true;
+    struct BehaviorParams {
+      bool enable_neural_movement = true;
+      bool natural_acceleration = true;
+      double jitter_factor = 0.02;
+      int update_rate_hz = 60;
+    } behavior;
+  };
+
   struct AutomationConfig {
+    CursorConfig cursor;
     StealthManager::StealthConfig stealth;
     HumanEmulator::BehaviorConfig behavior;
     FingerprintManager::CanvasConfig canvas;
@@ -34,6 +46,9 @@ class PlaywrightController {
   bool StealthyScreenshot(std::vector<uint8_t>* output);
   bool RotateFingerprint();
   bool SwitchProxy();
+
+  bool SetCursorVisibility(bool visible);
+  bool UpdateCursorBehavior(const CursorConfig& config);
 
  private:
   scoped_refptr<VirtualDisplay> virtual_display_;

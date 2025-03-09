@@ -1,0 +1,40 @@
+--- a/components/ungoogled/fingerprint/quantum_resistant_masking.h
++++ b/components/ungoogled/fingerprint/quantum_resistant_masking.h
+@@ -25,6 +25,18 @@ class QuantumResistantMasking {
+         MaskTCPIPParameters();
+         RandomizeDNSPatterns();
+     }
++    
++    // Initialize advanced fingerprint protection
++    fingerprint_orchestrator_.Initialize({
++        .canvas: {
++            .noise_level: 0.1,
++            .pattern_randomization: true
++        },
++        .webgl: {
++            .parameter_masking: true,
++            .context_randomization: true
++        }
++    });
+ 
+     // Enhanced thread pattern protection
+     thread_generator_.Configure({
+@@ -32,6 +44,13 @@ class QuantumResistantMasking {
+         .pattern_complexity: 0.9,
+         .timing_variation: 0.05
+     });
++
++--- a/components/ungoogled/fingerprint/thread_pattern_generator.h
++++ b/components/ungoogled/fingerprint/thread_pattern_generator.h
+@@ -25,6 +25,14 @@ class InfiniteThreadGenerator {
+     void ApplyThreadProtection() {
+         RandomizeThreadBehavior();
+         MaskThreadIdentifiers();
++        
++        // Enhanced thread protection
++        thread_protector_.Initialize({
++            .behavior_randomization: true,
++            .identifier_masking: true,
++            .context_protection: true,
++            .timing_obfuscation: 0.7
++        });

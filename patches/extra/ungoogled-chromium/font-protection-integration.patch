@@ -1,0 +1,20 @@
+--- a/components/ungoogled/font/font_fingerprint_protection.h
++++ b/components/ungoogled/font/font_fingerprint_protection.h
+@@ -20,6 +20,15 @@ class FontFingerprintProtection {
+         metrics_normalizer_.SetStandardMetrics();
+         metrics_normalizer_.AddSubpixelNoise();
+         
++        // Enhanced font protection
++        font_protector_.Initialize({
++            .metric_randomization: true,
++            .rendering_obfuscation: true,
++            .glyph_masking: true,
++            .system_font_protection: true,
++            .protection_level: 0.85
++        });
++        
+         // Advanced glyph protection
+         glyph_protector_.Configure({
+             .randomization_level: 0.7,
+             .pattern_masking: true
+         });

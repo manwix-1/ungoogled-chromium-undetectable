@@ -113,13 +113,35 @@ std::unique_ptr<BrowserInstance> LaunchProtocol::Launch(
     .strict_transport = true
   });
 
-  // Initialize virtual display with anti-detection
+  // Initialize virtual display with cursor config
   auto display = std::make_unique<VirtualDisplay>();
-  display->InitializeSecure({
-    .viewport = config.viewport,
-    .mask_gpu = true,
-    .randomize_canvas = true
-  });
+  VirtualDisplay::DisplayConfig display_config{
+    .render_cursor = true,
+    .size = config.viewport,
+    .cursor = {
+      .use_hardware_cursor = false,
+      .composite_with_content = true,
+      .z_order = 1000
+    }
+  };
+  display->Initialize(display_config);
+
+  // Configure human emulator with cursor behavior
+  auto human_emulator = std::make_unique<HumanEmulator>();
+  HumanEmulator::CursorBehaviorConfig cursor_behavior{
+    .enable_neural_patterns = true,
+    .movement = {
+      .base_speed = 1000.0,
+      .acceleration = 1.5,
+      .deceleration = 2.0,
+      .neural = {
+        .learning_rate = 0.001,
+        .adaptation_factor = 0.1,
+        .pattern_memory = 1000
+      }
+    }
+  };
+  human_emulator->UpdateCursorBehavior(cursor_behavior);
 
   // Create enhanced browser instance
   auto instance = std::make_unique<BrowserInstance>(

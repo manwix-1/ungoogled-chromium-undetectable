@@ -4,9 +4,7 @@ public:
         // Base platform components
         struct Platform {
             std::vector<std::string> os_names = {"Windows NT", "Macintosh", "X11", "Linux"};
-            std::vector<std::string> os_versions = {"10.0", "11.0", "12.0"};
             std::vector<std::string> architectures = {"x86_64", "aarch64", "arm64"};
-            std::vector<std::string> platforms = {"Win64", "Mac", "Linux x86_64"};
         };
 
         // Browser components

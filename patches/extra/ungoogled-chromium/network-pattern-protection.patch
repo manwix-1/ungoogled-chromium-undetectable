@@ -1,0 +1,38 @@
+--- a/components/ungoogled/network/pattern_protection.h
++++ b/components/ungoogled/network/pattern_protection.h
+@@ -10,6 +10,35 @@ class NetworkPatternProtection {
+ public:
+     void InitializeProtection() {
+         network_engine_.InitializeBaseline();
++        
++        // Enhanced network pattern protection
++        network_protector_.Configure({
++            .request_patterns = {
++                .timing_randomization: {
++                    .enabled: true,
++                    .variance: 0.1,  // 10% timing variance
++                    .distribution: "gaussian"
++                },
++                .header_normalization: {
++                    .order_randomization: true,
++                    .case_randomization: true,
++                    .value_normalization: true
++                }
++            },
++            .traffic_shaping = {
++                .packet_size_normalization: true,
++                .timing_distribution: {
++                    .type: "natural",
++                    .parameters: {
++                        .mean_delay: 15,  // ms
++                        .variance: 5      // ms
++                    }
++                }
++            },
++            .tls_fingerprint = {
++                .randomize_extensions: true,
++                .cipher_suite_rotation: true
++            }
++        });
+     }
+ };
