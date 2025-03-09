@@ -33,17 +33,21 @@ RUN wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/
     && ln -sf /usr/local/ungoogled-chromium/chrome /usr/local/bin/ungoogled-chromium \
     && rm ungoogled-chromium_134.0.6998.35-1_linux.tar.xz
 
-# Set up protection layers
-COPY components/ungoogled /opt/protection_layers/
+# Set up the application directory
 WORKDIR /app
 
-# Install Python requirements
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy protection configurations
+# Copy all necessary files
+COPY components/ /app/components/
+COPY protection_system/ /app/protection_system/
 COPY config/ /app/config/
 COPY patches/ /app/patches/
+COPY requirements.txt .
+
+# Install Python requirements
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Add the application directory to PYTHONPATH
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 # Initialize protection components
 RUN python3 -m protection_system.initialize \
