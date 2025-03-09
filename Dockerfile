@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-# Install dependencies
+# Install dependencies in a single layer
 RUN apt-get update && apt-get install -y \
     wget \
     python3 \
@@ -21,9 +21,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     tar \
     xz-utils \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir pip --upgrade
 
-# Download and install Ungoogled Chromium portable Linux version
+# Download and install Ungoogled Chromium in a single layer
 RUN wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
     && echo "f20616cebbaac86ee357a7037da8e0450f0e5100e0ee3f09e53232490ddb722a ungoogled-chromium_134.0.6998.35-1_linux.tar.xz" | sha256sum --check \
     && tar xf ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
@@ -38,7 +39,7 @@ WORKDIR /app
 
 # Install Python requirements
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy protection configurations
 COPY config/ /app/config/
