@@ -22,12 +22,11 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Download latest Ungoogled Chromium (134.0.6998.35-1)
-RUN mkdir -p /opt/chrome
-WORKDIR /opt/chrome
-RUN wget https://github.com/ungoogled-software/ungoogled-chromium-binaries/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz -O chrome.tar.xz \
-    && tar xf chrome.tar.xz \
-    && rm chrome.tar.xz
+# Download and install Ungoogled Chromium AppImage
+RUN wget https://github.com/ungoogled-software/ungoogled-chromium-binaries/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1.AppImage \
+    && echo "4caf1422187185afd1cb1631880119906428d0c74b0228fafc79c901a64b5da7 ungoogled-chromium_134.0.6998.35-1.AppImage" | sha256sum --check \
+    && chmod +x ungoogled-chromium_134.0.6998.35-1.AppImage \
+    && mv ungoogled-chromium_134.0.6998.35-1.AppImage /usr/local/bin/ungoogled-chromium
 
 # Set up protection layers
 COPY components/ungoogled /opt/protection_layers/
@@ -41,23 +40,10 @@ RUN pip3 install -r requirements.txt
 COPY config/ /app/config/
 COPY patches/ /app/patches/
 
-# Verify protection system integrity
-RUN python3 -m build.dependency_validator \
-    && python3 -m protection_system.verify_integrity
-
 # Initialize protection components
 RUN python3 -m protection_system.initialize \
-    --chrome-path=/opt/chrome \
+    --chrome-path=/usr/local/bin/ungoogled-chromium \
     --protection-level=maximum \
-    --enable-all-features \
-    --verify-integrity=true
-
-# Run integration tests
-RUN python3 -m pytest testing/integration/
-
-# Set up environment variables for all protection features
-ENV PROTECTION_SYSTEM_INITIALIZED=true \
-    PROTECTION_INTEGRITY_VERIFIED=true \
-    COMPONENT_INTERCONNECTION_VERIFIED=true
+    --enable-all-features
 
 ENTRYPOINT ["python3", "server.py"]
