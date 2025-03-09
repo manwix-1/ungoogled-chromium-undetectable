@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
     && apt-get install -y \
-    python3.13 \
-    python3.13-distutils \
-    python3.13-dev \
-    python3.13-venv \
+    python3.11 \
+    python3.11-distutils \
+    python3.11-dev \
+    python3.11-venv \
     libglib2.0-0 \
     libnss3 \
     libxcb1 \
@@ -29,9 +29,9 @@ RUN apt-get update && apt-get install -y \
     xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up Python 3.13
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.13 \
-    && python3.13 -m pip install --upgrade pip
+# Set up Python 3.11
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 \
+    && python3.11 -m pip install --upgrade pip
 
 # Download and install Ungoogled Chromium
 RUN wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
@@ -53,17 +53,17 @@ COPY config/ config/
 COPY patches/ patches/
 
 # Install build dependencies first
-RUN python3.13 -m pip install --no-cache-dir hatchling
+RUN python3.11 -m pip install --no-cache-dir hatchling
 
 # Create virtual environment and install dependencies
-RUN python3.13 -m venv /opt/venv
+RUN python3.11 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir -e .
 
 # Initialize protection components
-RUN python3.13 -m protection_system.initialize \
+RUN python3.11 -m protection_system.initialize \
     --chrome-path=/usr/local/bin/ungoogled-chromium \
     --protection-level=maximum \
     --enable-all-features
 
-ENTRYPOINT ["python3.13", "server.py"]
+ENTRYPOINT ["python3.11", "server.py"]
