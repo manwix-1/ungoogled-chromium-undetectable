@@ -57,20 +57,18 @@ RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-portablelin
 WORKDIR /app
 
 # Copy project files
-COPY pyproject.toml .
-COPY components/ components/
-COPY protection_system/ protection_system/
-COPY config/ config/
-COPY patches/ patches/
+COPY . .
 
 # Install build dependencies and project dependencies
 RUN python3.12 -m pip install --no-cache-dir hatchling \
     && python3.12 -m venv /opt/venv \
     && . /opt/venv/bin/activate \
-    && pip install --no-cache-dir -e .
+    && pip install -e . \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Set virtual environment in PATH
 ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 # Initialize protection components
 RUN python3.12 -m protection_system.initialize \
