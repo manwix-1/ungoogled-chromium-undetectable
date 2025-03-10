@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     software-properties-common \
     && add-apt-repository -y universe \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     python3.12 \
