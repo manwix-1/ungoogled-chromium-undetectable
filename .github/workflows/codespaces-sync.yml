@@ -2,8 +2,8 @@ name: Codespaces Sync
 
 on:
   push:
-    branches: [ main ]  # or whatever branches you want to sync
-  workflow_dispatch:    # allows manual trigger
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   sync-codespaces:
@@ -15,5 +15,9 @@ jobs:
         uses: github/codespaces-pre-build@v1
         with:
           prebuild-command: |
-            # Add any setup commands here
-            python3 -m pip install -r requirements.txt
+          
+            # Add any additional setup commands needed
+            python3 -m protection_system.initialize \
+              --chrome-path=/usr/local/bin/ungoogled-chromium \
+              --protection-level=maximum \
+              --enable-all-features

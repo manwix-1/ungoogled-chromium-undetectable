@@ -5,20 +5,16 @@ services:
       context: .
       shm_size: '2gb'
     volumes:
-      - ./data:/app/data
-      - ./components:/app/components
-      - ./patches:/app/patches
-      - ./fonts:/app/fonts:ro
-      - ./certificates:/app/certificates:ro
+      - ./components:/app/components:ro
+      - ./patches:/app/patches:ro
     environment:
       - PROTECTION_LEVEL=HIGH
       - ENABLE_NEURAL_EVASION=true
       - ENABLE_QUANTUM_RESISTANT=true
+      - PYTHONPATH=/app
     deploy:
       resources:
         limits:
           memory: 8G
         reservations:
           memory: 4G
-    tmpfs:
-      - /tmp:size=2G
