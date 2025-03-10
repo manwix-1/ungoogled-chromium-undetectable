@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gpg \
     gnupg \
     software-properties-common \
-    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && add-apt-repository -y universe \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     python3.12 \
-    python3.12-distutils \
     python3.12-dev \
     python3.12-venv \
+    python3-pip \
     wget \
     git \
     curl \
@@ -41,7 +41,7 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 
 # Set up Python 3.12
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 \
-    && python3.12 -m pip install --no-cache-dir --upgrade pip
+    && python3.12 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Download and install Ungoogled Chromium
 RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
