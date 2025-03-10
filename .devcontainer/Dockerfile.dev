@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/devcontainers/python:3.12
+
+# Install only development dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up development environment
+WORKDIR /workspaces/app
+COPY pyproject.toml .
+
+# Install dependencies without hardware-dependent features
+RUN pip install --no-cache-dir hatchling \
+    && pip install --no-cache-dir -e .
