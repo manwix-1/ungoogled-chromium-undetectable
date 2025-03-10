@@ -1,27 +1,62 @@
-# .dockerignore
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
 env/
 venv/
-.env
-.git
-.gitignore
-.pytest_cache/
-.coverage
-htmlcov/
-build/
-dist/
-*.egg-info/
+ENV/
+env.bak/
+venv.bak/
 
-# Additional patterns you might want to add
-node_modules/
-*.log
-.DS_Store
+# Version Control
+.git/
+.gitignore
+.gitattributes
+
+# IDE
 .idea/
 .vscode/
 *.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/*
+!data/.gitkeep
 tmp/
+temp/
+logs/
+*.log
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Large files/directories that can be rebuilt
 temp/
