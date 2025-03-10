@@ -56,16 +56,17 @@ RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-portablelin
 # Set up the application directory
 WORKDIR /app
 
-# Copy project files
+# Copy the entire project first
 COPY . .
 
-# Install build dependencies and project dependencies
-RUN python3.12 -m pip install --no-cache-dir hatchling \
-    && python3.12 -m venv /opt/venv \
+# Set up virtual environment and ensure proper package structure
+RUN python3.12 -m venv /opt/venv \
     && . /opt/venv/bin/activate \
-    && pip install -e .
+    && pip install --no-cache-dir hatchling \
+    && pip install -e . \
+    && python3.12 -c "import components.ungoogled.core.feature_registry" \
+    && deactivate
 
-# Set virtual environment in PATH
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app:${PYTHONPATH}"
 

@@ -2,16 +2,7 @@
 Root components package for Enhanced Ungoogled Chromium
 """
 
-from .ungoogled import (
-    ProtectionSystemManager,
-    ProtectionFeatureRegistry,
-    UnifiedProtection
-)
+from .ungoogled.core.feature_registry import ProtectionFeatureRegistry
+from .ungoogled.core.protection_system_manager import ProtectionSystemManager
 
-__version__ = '1.0.0'
-
-__all__ = [
-    'ProtectionSystemManager',
-    'ProtectionFeatureRegistry',
-    'UnifiedProtection'
-]
+__all__ = ['ProtectionFeatureRegistry', 'ProtectionSystemManager']
