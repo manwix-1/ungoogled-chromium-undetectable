@@ -63,8 +63,7 @@ COPY . .
 RUN python3.12 -m pip install --no-cache-dir hatchling \
     && python3.12 -m venv /opt/venv \
     && . /opt/venv/bin/activate \
-    && pip install -e . \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install -e .
 
 # Set virtual environment in PATH
 ENV PATH="/opt/venv/bin:$PATH"

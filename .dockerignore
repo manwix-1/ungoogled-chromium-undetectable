@@ -1,0 +1,27 @@
+# .dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.git
+.gitignore
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Additional patterns you might want to add
+node_modules/
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.swp
+tmp/
+temp/
