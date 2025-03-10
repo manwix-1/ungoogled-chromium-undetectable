@@ -1,16 +1,16 @@
 FROM ubuntu:22.04
 
-# Install dependencies in a single layer
-RUN apt-get update && apt-get install -y \
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install all dependencies in a single layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update \
-    && apt-get install -y \
-    python3.11 \
-    python3.11-distutils \
-    python3.11-dev \
-    python3.11-venv \
+    git \
+    curl \
+    tar \
+    xz-utils \
     libglib2.0-0 \
     libnss3 \
     libxcb1 \
@@ -23,18 +23,22 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxss1 \
     libxtst6 \
-    git \
-    curl \
-    tar \
-    xz-utils \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-distutils \
+    python3.11-dev \
+    python3.11-venv \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up Python 3.11
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 \
-    && python3.11 -m pip install --upgrade pip
+    && python3.11 -m pip install --no-cache-dir --upgrade pip
 
 # Download and install Ungoogled Chromium
-RUN wget https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
+RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
     && echo "f20616cebbaac86ee357a7037da8e0450f0e5100e0ee3f09e53232490ddb722a ungoogled-chromium_134.0.6998.35-1_linux.tar.xz" | sha256sum --check \
     && tar xf ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
     && mkdir -p /usr/local/ungoogled-chromium \
@@ -52,13 +56,14 @@ COPY protection_system/ protection_system/
 COPY config/ config/
 COPY patches/ patches/
 
-# Install build dependencies first
-RUN python3.11 -m pip install --no-cache-dir hatchling
+# Install build dependencies and project dependencies
+RUN python3.11 -m pip install --no-cache-dir hatchling \
+    && python3.11 -m venv /opt/venv \
+    && . /opt/venv/bin/activate \
+    && pip install --no-cache-dir -e .
 
-# Create virtual environment and install dependencies
-RUN python3.11 -m venv /opt/venv
+# Set virtual environment in PATH
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir -e .
 
 # Initialize protection components
 RUN python3.11 -m protection_system.initialize \
@@ -66,4 +71,3 @@ RUN python3.11 -m protection_system.initialize \
     --protection-level=maximum \
     --enable-all-features
 
-ENTRYPOINT ["python3.11", "server.py"]
