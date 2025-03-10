@@ -1,0 +1,19 @@
+name: Codespaces Sync
+
+on:
+  push:
+    branches: [ main ]  # or whatever branches you want to sync
+  workflow_dispatch:    # allows manual trigger
+
+jobs:
+  sync-codespaces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: GitHub Codespaces Pre-build
+        uses: github/codespaces-pre-build@v1
+        with:
+          prebuild-command: |
+            # Add any setup commands here
+            python3 -m pip install -r requirements.txt
