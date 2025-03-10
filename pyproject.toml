@@ -2,7 +2,7 @@
 name = "enhanced-ungoogled-chromium"
 version = "1.0.0"
 description = "Enhanced Ungoogled Chromium with Advanced Protection System"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "playwright>=1.30.0",
     "requests>=2.28.0",

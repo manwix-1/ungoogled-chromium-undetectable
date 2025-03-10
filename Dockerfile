@@ -3,10 +3,19 @@ FROM ubuntu:22.04
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install all dependencies in a single layer
+# Install dependencies in a single layer with proper ordering
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
+    gpg \
+    gnupg \
     software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+    python3.12 \
+    python3.12-distutils \
+    python3.12-dev \
+    python3.12-venv \
+    wget \
     git \
     curl \
     tar \
@@ -23,19 +32,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libxss1 \
     libxtst6 \
-    && add-apt-repository -y ppa:deadsnakes/ppa \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-    python3.11 \
-    python3.11-distutils \
-    python3.11-dev \
-    python3.11-venv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up Python 3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 \
-    && python3.11 -m pip install --no-cache-dir --upgrade pip
+# Ensure Python 3.12 is the default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
+    && update-alternatives --set python3 /usr/bin/python3.12
+
+# Set up Python 3.12
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 \
+    && python3.12 -m pip install --no-cache-dir --upgrade pip
 
 # Download and install Ungoogled Chromium
 RUN wget -q https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/134.0.6998.35-1/ungoogled-chromium_134.0.6998.35-1_linux.tar.xz \
@@ -57,8 +63,8 @@ COPY config/ config/
 COPY patches/ patches/
 
 # Install build dependencies and project dependencies
-RUN python3.11 -m pip install --no-cache-dir hatchling \
-    && python3.11 -m venv /opt/venv \
+RUN python3.12 -m pip install --no-cache-dir hatchling \
+    && python3.12 -m venv /opt/venv \
     && . /opt/venv/bin/activate \
     && pip install --no-cache-dir -e .
 
@@ -66,7 +72,7 @@ RUN python3.11 -m pip install --no-cache-dir hatchling \
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Initialize protection components
-RUN python3.11 -m protection_system.initialize \
+RUN python3.12 -m protection_system.initialize \
     --chrome-path=/usr/local/bin/ungoogled-chromium \
     --protection-level=maximum \
     --enable-all-features
